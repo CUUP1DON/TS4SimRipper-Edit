@@ -1004,6 +1004,7 @@ namespace TS4SimRipper
             morphNormals = normalList;
 
             string tonePackage = "";
+            currentPelt = sim.pelt_layers?.layers ?? new List<TS4SaveGame.PeltLayerData>();
             if (currentSpecies == Species.Human && currentOccult != SimOccult.Werewolf)
             {
                 SkinState_comboBox.SelectedIndexChanged -= SkinState_comboBox_SelectedIndexChanged;
@@ -1078,7 +1079,6 @@ namespace TS4SimRipper
             }
             else
             {
-                currentPelt = sim.pelt_layers.layers;
                 SkinState_comboBox.Enabled = false;
             }
 

@@ -71,6 +71,10 @@ namespace TS4SimRipper
                     }
                 }
             }
+            else if (currentOccult == SimOccult.Fairy)
+            {
+                details = Properties.Resources.FairySkin;
+            }
             else
             {
                 details = currentSpecies switch{

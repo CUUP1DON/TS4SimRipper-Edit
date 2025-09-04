@@ -1097,7 +1097,7 @@ namespace TS4SimRipper
                     currentGlassTexture = image;
                     currentGlassSpecular = spec;
                 }
-
+                
                 if (wingStack.Count > 0)
                 {
                     wingStack.Sort((x, y) => x.sortLayer.CompareTo(y.sortLayer));
@@ -1164,6 +1164,10 @@ namespace TS4SimRipper
                     {
                         currentSkin = DisplayableSkintone(currentTONE, currentSkinShift, currentSkinSet, currentTanLines, currentAge, currentGender, currentPhysique,
                             pregnancyProgress, currentSculptOverlay, currentOutfitOverlay);
+                    }
+                    if (currentOccult == SimOccult.Fairy)
+                    {
+                        currentWingsTexture = DisplayablePelt(currentPelt, currentWingsTexture, currentPhysique);                        
                     }
                 }
                 else
@@ -1770,7 +1774,7 @@ namespace TS4SimRipper
             catch (Exception e)
             {
                 bool dirExist = Directory.Exists(Path.GetDirectoryName(testname));
-                MessageBox.Show("Unable to save image to file: " + testname + Environment.NewLine 
+                MessageBox.Show("Unable to save image to file: " + testname + Environment.NewLine
                     + "Directory " + Path.GetDirectoryName(testname) + " exists: " + dirExist.ToString() + Environment.NewLine
                     + e.ToString());
             }
