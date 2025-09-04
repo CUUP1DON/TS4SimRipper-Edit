@@ -82,8 +82,9 @@ namespace TS4SimRipper
             int indexOffset = 0;
 
             GEOM g = simgeom;
+            GEOM.GeometryState geostate = g.GeometryStates.FirstOrDefault() ?? new GEOM.GeometryState() { VertexCount = g.numberVertices, PrimitiveCount = g.numberFaces };
 
-            for (int i = 0; i < g.numberVertices; i++)
+            for (int i = geostate.MinVertexIndex; i < geostate.VertexCount; i++)
             {
                 float[] pos = g.getPosition(i);
                 verts.Add(new Point3D(pos[0], pos[1] - (yOffset * .5), pos[2]));
@@ -93,15 +94,15 @@ namespace TS4SimRipper
                 uvs.Add(new Point(uv[0], uv[1]));
             }
 
-            for (int i = 0; i < g.numberFaces; i++)
+            for (int i = geostate.StartIndex; i < geostate.PrimitiveCount; i++)
             {
-                int[] face = g.getFaceIndices(i);
+                int[] face = g.getFaceIndices(i+ geostate.MinVertexIndex);
                 facepoints.Add(face[0] + indexOffset);
                 facepoints.Add(face[1] + indexOffset);
                 facepoints.Add(face[2] + indexOffset);
             }
 
-            indexOffset += g.numberVertices;
+            indexOffset += geostate.VertexCount;
 
             mesh.Positions = verts;
             mesh.TriangleIndices = facepoints;

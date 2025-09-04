@@ -367,7 +367,9 @@ namespace TS4SimRipper
                     if (res == DialogResult.Cancel) return;
                     else uvSet = 0;
                 }
-                for (int i = 0; i < geom[m].numberVertices; i++)
+                
+                GEOM.GeometryState geostate = geom[m].GeometryStates.FirstOrDefault() ?? new GEOM.GeometryState() { VertexCount = geom[m].numberVertices, PrimitiveCount = geom[m].numberFaces };
+                for (int i = geostate.MinVertexIndex; i < geostate.VertexCount; i++)
                 {
                     positionList.Add(new Position(geom[m].getPosition(i)));
                     normalList.Add(new Normal(geom[m].getNormal(i)));
@@ -377,11 +379,11 @@ namespace TS4SimRipper
                     if (includeVertexID) idList.Add(geom[m].getVertexID(i));
                 }
                 this.groupList.Add(new Group(groupnames[m]));
-                for (int i = 0; i < geom[m].numberFaces; i++)
+                for (int i = geostate.StartIndex; i < geostate.PrimitiveCount; i++)
                 {
                     this.groupList[groupNum].addFace(new Face(geom[m].getFaceIndices(i), vertOffset));
                 }
-                vertOffset += geom[m].numberVertices;
+                vertOffset += geostate.VertexCount;
                 groupNum++;
             }
         }

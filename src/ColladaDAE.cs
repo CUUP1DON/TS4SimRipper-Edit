@@ -561,6 +561,7 @@ namespace TS4SimRipper
             for (int m = 0; m < geomArray.Length; m++)
             {
                 GEOM geom = new GEOM(geomArray[m]);
+                GEOM.GeometryState geostate = geom.GeometryStates.FirstOrDefault() ?? new GEOM.GeometryState() { VertexCount = geom.numberVertices, PrimitiveCount = geom.numberFaces };
                 geom.FixUnusedBones();
                 ColladaMesh mesh = new ColladaMesh();
                 mesh.meshName = meshNames != null ? meshNames[m].Replace(" ", "") : "CASMesh" + m.ToString();
@@ -593,7 +594,7 @@ namespace TS4SimRipper
                 mesh.jointNames = boneNames.ToArray();
                 mesh.inverseBindMatrix = inverseBinds.ToArray();
                 bool unassignedBones = false;
-                for (int v = 0; v < geom.numberVertices; v++)
+                for (int v = geostate.MinVertexIndex; v < geostate.VertexCount; v++)
                 {
                     positions.Add(axisTransform * new Vector3(geom.getPosition(v)));
                     if (hasNormals) normals.Add(axisTransform * new Vector3(geom.getNormal(v)));
@@ -633,7 +634,7 @@ namespace TS4SimRipper
                 mesh.offsets = new Offsets(positionOffset, normalsOffset, uvOffsets, colorsOffset);
 
                 List<uint> facepoints = new List<uint>();
-                for (int f = 0; f < geom.numberFaces; f++)
+                for (int f = geostate.StartIndex; f < geostate.PrimitiveCount; f++)
                 {
                     uint[] face = geom.getFaceIndicesUint(f);
                     for (int i = 0; i < 3; i++)
