@@ -207,7 +207,7 @@ namespace TS4SimRipper
             {
                 MaterialGroup wingsMaterial = new MaterialGroup();
                 wingsMaterial.Children.Add(new DiffuseMaterial(GetImageBrush(wingTexture)));
-                if (wingSpecular != null) myMaterial.Children.Add(new SpecularMaterial(GetImageBrush(wingSpecular), 25d));
+                if (wingSpecular != null) wingsMaterial.Children.Add(new SpecularMaterial(GetImageBrush(wingSpecular), 25d));
                 for (int i = wings.Length - 1; i >= 0; i--)
                 {
                     if (wings[i] != null)

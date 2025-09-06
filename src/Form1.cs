@@ -1546,7 +1546,7 @@ namespace TS4SimRipper
             morphPreview1.Stop_Mesh();
             GetCurrentModel();
             morphPreview1.Start_Mesh(CurrentModel, GlassModel, WingsModel, currentTexture, currentClothingSpecular,
-                currentGlassTexture, currentGlassSpecular, currentWingsTexture, currentWingsTexture, false, SeparateMeshesByShader);
+                currentGlassTexture, currentGlassSpecular, currentWingsTexture, currentWingsSpecular, false, SeparateMeshesByShader);
             Working_label.Visible = false;
         }
 
