@@ -147,6 +147,7 @@
             this.label1.Size = new System.Drawing.Size(270, 13);
             this.label1.TabIndex = 11;
             this.label1.Text = "Please enter correct paths or make blank to autodetect.";
+            this.label1.Text = "Changes will not take effect until the program is restarted. Save will restart the program.";
             // 
             // label6
             // 

@@ -1642,13 +1642,23 @@ namespace TS4SimRipper
             {
                 for (int i = CurrentModel.Length - 1; i >= 0; i--)
                 {
-                    var model = CurrentModel[i] ?? GlassModel[i] ?? WingsModel[i];
-                    if (model != null)
+                    if (CurrentModel[i] != null)
                     {
-                        GEOM tmp = new GEOM(model);// CurrentModel[i] != null ? new GEOM(CurrentModel[i]) : GlassModel[i]!=null? new GEOM(GlassModel[i]): new GEOM(WingsModel[i]);
-                        tmp.AppendMesh(model);
+                        GEOM tmp = new GEOM(CurrentModel[i]);
                         geomList.Add(tmp);
                         nameList.Add(partNames[i]);
+                    }
+                    if (GlassModel[i] != null)
+                    {
+                        GEOM tmp = new GEOM(GlassModel[i]);
+                        geomList.Add(tmp);
+                        nameList.Add(partNames[i] + "_glass");
+                    }
+                    if (WingsModel[i] != null)
+                    {
+                        GEOM tmp = new GEOM(WingsModel[i]);
+                        geomList.Add(tmp);
+                        nameList.Add(partNames[i] + "_wings");
                     }
                 }
                 //if (CurrentModel[(int)BodyType.Hair] != null || GlassModel[(int)BodyType.Hair] != null)

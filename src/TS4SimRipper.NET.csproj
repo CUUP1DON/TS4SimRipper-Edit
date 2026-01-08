@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFrameworks>net6.0-windows;net8.0-windows</TargetFrameworks>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <PlatformTarget>x64</PlatformTarget>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -32,19 +32,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DDSPanel">
-      <HintPath>$(S4PI_LIB)\DDSPanel.dll</HintPath>
+      <HintPath>..\..\Resouces\s4pi.Library DLLs\DDSPanel.dll</HintPath>
     </Reference>
     <Reference Include="s4pi.ImageResource">
-      <HintPath>$(S4PI_LIB)\s4pi.ImageResource.dll</HintPath>
+      <HintPath>..\..\Resouces\s4pi.Library DLLs\s4pi.ImageResource.dll</HintPath>
     </Reference>
     <Reference Include="s4pi.Interfaces">
-      <HintPath>$(S4PI_LIB)\s4pi.Interfaces.dll</HintPath>
+      <HintPath>..\..\Resouces\s4pi.Library DLLs\s4pi.Interfaces.dll</HintPath>
     </Reference>
     <Reference Include="s4pi.Package">
-      <HintPath>$(S4PI_LIB)\s4pi.Package.dll</HintPath>
+      <HintPath>..\..\Resouces\s4pi.Library DLLs\s4pi.Package.dll</HintPath>
     </Reference>
     <Reference Include="s4pi.Settings">
-      <HintPath>$(S4PI_LIB)\s4pi.Settings.dll</HintPath>
+      <HintPath>..\..\Resouces\s4pi.Library DLLs\s4pi.Settings.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

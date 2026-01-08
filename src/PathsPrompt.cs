@@ -96,6 +96,8 @@ namespace TS4SimRipper
             }
         }
 
+        public bool SettingsSaved { get; private set; }
+
         private void button1_Click(object sender, EventArgs e)
         {
             Properties.Settings.Default.TS4Path = TS4PathString.Text;
@@ -103,6 +105,8 @@ namespace TS4SimRipper
             Properties.Settings.Default.TS4ModsPath = TS4UserPathString.Text;
             Properties.Settings.Default.TS4SavesPath = TS4SavesPathString.Text;
             Properties.Settings.Default.Save();
+            SettingsSaved = true;
+            DialogResult = DialogResult.OK;
             this.Close();
         }
     }

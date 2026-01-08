@@ -423,6 +423,7 @@ namespace TS4SimRipper
             foreach (KeyValuePair<TGI, uint> kv in tmp)
             {
                 SMOD smod = FetchGameSMOD(kv.Key, ref errorMsg);
+                if (smod == null) continue;
                 List<ulong> morphs = new List<ulong>();
                 if (smod.BGEOKey != null)
                 {
@@ -431,9 +432,9 @@ namespace TS4SimRipper
                         if (tgi.Instance > 0) AddModToDictionary(dict, kv.Key.Instance, tgi.Instance);
                     }
                 }
-                if (smod.bonePoseKey.Instance > 0) AddModToDictionary(dict, kv.Key.Instance, smod.bonePoseKey.Instance);
-                if (smod.deformerMapShapeKey.Instance > 0) AddModToDictionary(dict, kv.Key.Instance, smod.deformerMapShapeKey.Instance); 
-                if (smod.deformerMapNormalKey.Instance > 0) AddModToDictionary(dict, kv.Key.Instance, smod.deformerMapNormalKey.Instance);
+                if (smod.bonePoseKey != null && smod.bonePoseKey.Instance > 0) AddModToDictionary(dict, kv.Key.Instance, smod.bonePoseKey.Instance);
+                if (smod.deformerMapShapeKey != null && smod.deformerMapShapeKey.Instance > 0) AddModToDictionary(dict, kv.Key.Instance, smod.deformerMapShapeKey.Instance);
+                if (smod.deformerMapNormalKey != null && smod.deformerMapNormalKey.Instance > 0) AddModToDictionary(dict, kv.Key.Instance, smod.deformerMapNormalKey.Instance);
             }
             return dict;
         }

@@ -640,8 +640,23 @@ namespace TS4SimRipper
                     uint[] face = geom.getFaceIndicesUint(f);
                     for (int i = 0; i < 3; i++)
                     {
-                        for (int j = 0; j < mesh.Stride; j++)
+                        // Add position index
                         facepoints.Add(face[i]);
+
+                        // Add normal index (same as position for shared vertices)
+                        if (hasNormals)
+                            facepoints.Add(face[i]);
+
+                        // Add UV indices (same as position for shared vertices)
+                        if (hasUVs)
+                        {
+                            for (int j = 0; j < geom.numberUVsets; j++)
+                                facepoints.Add(face[i]);
+                        }
+
+                        // Add color index (same as position for shared vertices)
+                        if (hasColors)
+                            facepoints.Add(face[i]);
                     }
                 }
                 mesh.facePoints = facepoints.ToArray();
@@ -844,11 +859,11 @@ namespace TS4SimRipper
                                 {
                                     emission = new common_color_or_texture_type() { Item = new common_color_or_texture_typeColor() { sid = "emission", Values = new double[] { 0d, 0d, 0d, 1d } } },
                                     ambient = new common_color_or_texture_type() { Item = new common_color_or_texture_typeColor() { sid = "ambient", Values = new double[] { 0d, 0d, 0d, 1d } } },
-                                    diffuse = new common_color_or_texture_type() { Item = new common_color_or_texture_typeTexture() { texture = basename + matCount + "_diffuse_png-sampler", texcoord = geom.id + "-map-0" } },
+                                    diffuse = new common_color_or_texture_type() { Item = new common_color_or_texture_typeTexture() { texture = basename + matCount + "_diffuse_png-sampler", texcoord = "uv_0" } },
                                     //specular = new common_color_or_texture_type() { Item = new common_color_or_texture_typeColor() { sid = "specular", Values = new double[] { 0.5, 0.5, 0.5, 1d } } },
-                                    specular = new common_color_or_texture_type() { Item = new common_color_or_texture_typeTexture() { texture = basename + matCount + "_specular_png-sampler", texcoord = geom.id + "-map-0" } },
+                                    specular = new common_color_or_texture_type() { Item = new common_color_or_texture_typeTexture() { texture = basename + matCount + "_specular_png-sampler", texcoord = "uv_0" } },
                                     shininess = new common_float_or_param_type() { Item = new common_float_or_param_typeFloat() { sid = "shininess", Value = 25d } },
-                                    transparent = new common_transparent_type() { opaque = fx_opaque_enum.A_ONE, Item = new common_color_or_texture_typeTexture() { texture = basename + matCount + "_diffuse_png-sampler", texcoord = geom.id + "-map-0" } },
+                                    transparent = new common_transparent_type() { opaque = fx_opaque_enum.A_ONE, Item = new common_color_or_texture_typeTexture() { texture = basename + matCount + "_diffuse_png-sampler", texcoord = "uv_0" } },
                                     index_of_refraction = new common_float_or_param_type() { Item = new common_float_or_param_typeFloat() { sid = "index_of_refraction", Value = 1d } }
                                 }
                             }
@@ -936,10 +951,11 @@ namespace TS4SimRipper
                     if (uvs[j].Length > 0)
                     {
                         index++;
-                        daemesh.source[index] = new source() { id = geom.id + "-map-" + j.ToString() };
-                        daemesh.source[index].Item = new float_array() { id = geom.id + "-map-" + j.ToString() + "-array", count = (ulong)uvs[j].Length, Values = uvs[j] };
+                        string uvId = "uv_" + j.ToString();
+                        daemesh.source[index] = new source() { id = uvId };
+                        daemesh.source[index].Item = new float_array() { id = uvId + "-array", count = (ulong)uvs[j].Length, Values = uvs[j] };
                         daemesh.source[index].technique_common = new sourceTechnique_common();
-                        daemesh.source[index].technique_common.accessor = new accessor() { source = "#" + geom.id + "-map-" + j.ToString() + "-array", count = (ulong)(uvs[j].Length / 2), stride = 2 };
+                        daemesh.source[index].technique_common.accessor = new accessor() { source = "#" + uvId + "-array", count = (ulong)(uvs[j].Length / 2), stride = 2 };
                         param u = new param() { name = "S", type = "float" };
                         param v = new param() { name = "T", type = "float" };
                         daemesh.source[index].technique_common.accessor.param = new param[] { u, v };
@@ -981,7 +997,7 @@ namespace TS4SimRipper
                 for (int j = 0; j < uvs.GetLength(0); j++)
                 {
                     index++;
-                    polyInputs[index] = new InputLocalOffset() { semantic = "TEXCOORD", source = "#" + geom.id + "-map-" + j.ToString(), offset = (ulong)cmesh.offsets.uvOffset[j], set = (ulong)j, setSpecified = true };
+                    polyInputs[index] = new InputLocalOffset() { semantic = "TEXCOORD", source = "#uv_" + j.ToString(), offset = (ulong)cmesh.offsets.uvOffset[j], set = (ulong)j, setSpecified = true };
                 }
                 if (colors.Length > 0)
                 {
@@ -1123,7 +1139,7 @@ namespace TS4SimRipper
                                                 {
                                                     new instance_materialBind_vertex_input()
                                                     {
-                                                        semantic = basename + "-mesh-map-0",
+                                                        semantic = "uv_0",
                                                         input_semantic = "TEXCOORD",
                                                         input_set = 0
                                                     }
@@ -1303,6 +1319,7 @@ namespace TS4SimRipper
 
             /// <summary>
             /// Prevents normals edges caused by uv seams. Should be used only when converting TS4 meshes.
+            /// Also handles duplicate vertices from separate GEOM meshes that share the same geometry.
             /// </summary>
             public void Clean()
             {
@@ -1311,25 +1328,95 @@ namespace TS4SimRipper
                 List<Vector3> newPositions = new List<Vector3>();
                 List<Vector3> newNormals = new List<Vector3>();
                 List<BoneAssignment> newBones = new List<BoneAssignment>();
+                List<Vector2[]> newUVs = new List<Vector2[]>();
+                bool hasUVs = this.uvs != null && this.uvs.GetLength(0) > 0 && this.uvs[0] != null && this.uvs[0].Length > 0;
+
                 for (uint i = 0; i < this.positions.Length; i++)
                 {
-                    int posIndex = newPositions.IndexOf(this.positions[i]);
-                    int normIndex = newNormals.IndexOf(this.normals[i]);
+                    // Look for an existing vertex with same position, normal, and UVs
+                    int matchIndex = -1;
+                    for (int j = 0; j < newPositions.Count; j++)
+                    {
+                        // Check if position and normal match
+                        bool posNormMatch = newPositions[j].Equals(this.positions[i]) && newNormals[j].Equals(this.normals[i]);
+                        
+                        if (posNormMatch)
+                        {
+                            // If we have UVs, also check if they match
+                            if (hasUVs)
+                            {
+                                bool uvMatch = true;
+                                for (int uvSet = 0; uvSet < this.uvs.GetLength(0); uvSet++)
+                                {
+                                    if (this.uvs[uvSet] != null && this.uvs[uvSet].Length > i)
+                                    {
+                                        if (!newUVs[uvSet][j].Equals(this.uvs[uvSet][i]))
+                                        {
+                                            uvMatch = false;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (uvMatch) matchIndex = j;
+                            }
+                            else
+                            {
+                                matchIndex = j;
+                            }
+                        }
+                        if (matchIndex >= 0) break;
+                    }
+
                     uint tag = this.colors[i] & 0x00FF0000;
-                    if ((posIndex < 0 || normIndex < 0) || (posIndex != normIndex) || tag > 0)
+                    if (matchIndex < 0 || tag > 0)
                     {
                         trans[i] = (uint)newPositions.Count;
                         newPositions.Add(this.positions[i]);
                         newNormals.Add(this.normals[i]);
                         if (this.HasBones) newBones.Add(this.bones[i]);
+                        if (hasUVs)
+                        {
+                            // Make sure we have enough UV sets in newUVs
+                            while (newUVs.Count < this.uvs.GetLength(0))
+                            {
+                                newUVs.Add(new List<Vector2>().ToArray());
+                            }
+                            // Add UV values for this vertex to each UV set
+                            List<Vector2>[] tempUVs = new List<Vector2>[this.uvs.GetLength(0)];
+                            for (int uvSet = 0; uvSet < this.uvs.GetLength(0); uvSet++)
+                            {
+                                tempUVs[uvSet] = new List<Vector2>(newUVs[uvSet]);
+                                if (this.uvs[uvSet] != null && this.uvs[uvSet].Length > i)
+                                {
+                                    tempUVs[uvSet].Add(this.uvs[uvSet][i]);
+                                }
+                                else
+                                {
+                                    tempUVs[uvSet].Add(new Vector2(0, 0));
+                                }
+                            }
+                            for (int uvSet = 0; uvSet < this.uvs.GetLength(0); uvSet++)
+                            {
+                                newUVs[uvSet] = tempUVs[uvSet].ToArray();
+                            }
+                        }
                     }
                     else
                     {
-                        trans[i] = (uint)posIndex;
+                        trans[i] = (uint)matchIndex;
                     }
                 }
                 this.positions = newPositions.ToArray();
                 this.normals = newNormals.ToArray();
+                if (hasUVs)
+                {
+                    Vector2[][] uvsArray = new Vector2[this.uvs.GetLength(0)][];
+                    for (int uvSet = 0; uvSet < this.uvs.GetLength(0); uvSet++)
+                    {
+                        uvsArray[uvSet] = newUVs[uvSet];
+                    }
+                    this.uvs = uvsArray;
+                }
                 if (this.HasBones) this.bones = newBones.ToArray();
                 for (int i = 0; i < this.facePoints.Length; i += this.Stride)
                 {
@@ -1337,6 +1424,18 @@ namespace TS4SimRipper
                     int normIndex = i + this.offsets.normalsOffset;
                     this.facePoints[posIndex] = trans[this.facePoints[posIndex]];
                     this.facePoints[normIndex] = trans[this.facePoints[normIndex]];
+                    // Also update UV indices if we have them
+                    if (hasUVs && this.offsets.uvOffset != null)
+                    {
+                        for (int uvSet = 0; uvSet < this.offsets.uvOffset.Length; uvSet++)
+                        {
+                            int uvIndex = i + this.offsets.uvOffset[uvSet];
+                            if (uvIndex < this.facePoints.Length)
+                            {
+                                this.facePoints[uvIndex] = trans[this.facePoints[uvIndex]];
+                            }
+                        }
+                    }
                 }
             }
         }

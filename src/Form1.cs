@@ -1470,8 +1470,17 @@ namespace TS4SimRipper
 
         private void setupToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Form f = new PathsPrompt(Properties.Settings.Default.TS4Path, Properties.Settings.Default.TS4ContentPath, Properties.Settings.Default.TS4ModsPath, Properties.Settings.Default.TS4SavesPath);
-            f.ShowDialog();
+            using (Form f = new PathsPrompt(Properties.Settings.Default.TS4Path, Properties.Settings.Default.TS4ContentPath, Properties.Settings.Default.TS4ModsPath, Properties.Settings.Default.TS4SavesPath))
+            {
+                if (f.ShowDialog() == DialogResult.OK)
+                {
+                    PathsPrompt pathsPrompt = f as PathsPrompt;
+                    if (pathsPrompt != null && pathsPrompt.SettingsSaved)
+                    {
+                        Application.Restart();
+                    }
+                }
+            }
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)

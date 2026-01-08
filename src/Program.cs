@@ -18,11 +18,9 @@ namespace TS4SimRipper
         [STAThread]
         static void Main()
         {
-            #if NETCORE
-            // Application.SetDefaultFont(new Font(new FontFamily("Microsoft Sans Serif"), 12f));
+            // Register encoding provider for legacy encodings (ISO-8859-8, etc.)
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             Application.SetHighDpiMode(HighDpiMode.DpiUnaware);
-            #endif
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());

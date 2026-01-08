@@ -6,7 +6,7 @@
              mc:Ignorable="d" d:DesignHeight="493" d:DesignWidth="458" FlowDirection="LeftToRight">
     <Grid Width="453" Height="488">
         <Grid.RowDefinitions>
-            
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Canvas Height="485" HorizontalAlignment="Left" Name="canvas1" VerticalAlignment="Top" Width="451" FlowDirection="LeftToRight">
             <Slider Canvas.Left="414" Canvas.Top="91" Height="294" Name="sliderZoom" Width="23" Orientation="Vertical" Minimum="-6" ValueChanged="sliderZoom_ValueChanged" Value="-3" Maximum="-0.01" FlowDirection="RightToLeft" UseLayoutRounding="False" />
