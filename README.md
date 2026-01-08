@@ -1,7 +1,8 @@
 # TS4 SimRipper Classic
 > [!IMPORTANT]
 > This program was modified using the help of claude.ai.
-
+> [!WARNING]
+> DO NOT create issues about this fork in the original repository! Use the [Issues](https://github.com/CmarNYC-Tools/TS4SimRipper/issues) tab of THIS repository to report bugs or create feature requests.
 > [!IMPORTANT]
 > This program was originally created by [CmarNYC](https://modthesims.info/d/635720/ts4-simripper-classic-rip-sims-from-savegames-v3-14-2-0-updated-4-19-2023.html) & is currently being maintained by [andrews4s](https://github.com/CmarNYC-Tools/TS4SimRipper).
 
