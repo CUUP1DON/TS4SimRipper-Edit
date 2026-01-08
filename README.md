@@ -6,7 +6,7 @@
 > This program was modified using the help of claude.ai.
 
 > [!WARNING]
-> DO NOT create issues about this fork in the original repository! Use the [Issues](https://github.com/CmarNYC-Tools/TS4SimRipper/issues) tab of THIS repository to report bugs or create feature requests.
+> DO NOT create issues about this fork in the original repository! Use the [Issues](https://github.com/CUUP1DON/TS4SimRipper/issues) tab of THIS repository to report bugs or create feature requests.
 
 ## Requirements
 This program requires [Microsoft .NET Desktop Runtime 10.0](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
