@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
+using System.Diagnostics;
 using ProtoBuf;
 using s4pi.Package;
 using s4pi.Interfaces;
@@ -24,6 +25,22 @@ namespace TS4SimRipper
         Package TroubleshootPackageBasic = (Package)Package.NewPackage(0);
         Package TroubleshootPackageOutfit = (Package)Package.NewPackage(0);
         public Dictionary<ulong, List<ulong>> GameModifierMorphs = new Dictionary<ulong, List<ulong>>();
+
+        private static string FormatPackageOpenError(string packagePath, Exception ex)
+        {
+            Exception root = ex;
+            while (root.InnerException != null) root = root.InnerException;
+
+            string message = root.Message;
+
+            // Common failure when s4pi encounters invalid offsets/lengths while parsing a package.
+            if (root is ArgumentOutOfRangeException aoore && string.Equals(aoore.ParamName, "value", StringComparison.OrdinalIgnoreCase))
+            {
+                message = "Invalid package data (negative value). This package is likely corrupted or uses a format the bundled s4pi can't parse.";
+            }
+
+            return packagePath + " : " + message + " (" + root.GetType().Name + ")" + Environment.NewLine;
+        }
 
         private bool DetectFilePaths()
         {
@@ -119,9 +136,90 @@ namespace TS4SimRipper
             return (Directory.Exists(Properties.Settings.Default.TS4Path) & Directory.Exists(Properties.Settings.Default.TS4ModsPath));
         }
 
-        private bool SetupGamePacks(bool debug)
+        private bool SetupGamePacks(bool debug, StartMessage starter)
         {
             if (debug) MessageBox.Show("Starting setup game packs");
+
+            int processed = 0;
+            int total = 0;
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
+            void Report(string stage, string file)
+            {
+                if (starter == null) return;
+
+                TimeSpan? eta = null;
+                if (processed >= 5 && total > 0)
+                {
+                    double avgSeconds = stopwatch.Elapsed.TotalSeconds / processed;
+                    int remaining = Math.Max(0, total - processed);
+                    eta = TimeSpan.FromSeconds(Math.Max(0, avgSeconds * remaining));
+                }
+
+                string status = stage;
+                if (!string.IsNullOrEmpty(file)) status += ": " + file;
+                starter.SetProgress(processed, total, status, eta);
+
+                // Keep the splash responsive during long-running loops.
+                if (processed % 10 == 0) Application.DoEvents();
+            }
+
+            HashSet<uint> resourceTypesToIndex = new HashSet<uint>
+            {
+                (uint)ResourceTypes.Sculpt,
+                (uint)ResourceTypes.SimModifier,
+                (uint)ResourceTypes.BlendGeometry,
+                (uint)ResourceTypes.DeformerMap,
+                (uint)ResourceTypes.BoneDelta,
+                (uint)ResourceTypes.CASP,
+                (uint)ResourceTypes.GEOM,
+                (uint)ResourceTypes.RMap,
+                (uint)ResourceTypes.RLE2,
+                (uint)ResourceTypes.RLES,
+                (uint)ResourceTypes.LRLE,
+                (uint)ResourceTypes.DDS,
+                (uint)ResourceTypes.DDSuncompressed,
+                (uint)ResourceTypes.TONE,
+                (uint)ResourceTypes.PeltLayer,
+                (uint)ResourceTypes.Rig,
+                (uint)ResourceTypes.Tuning1,
+                (uint)ResourceTypes.Tuning2
+            };
+
+            bool TryIndexPackageResources(Package package, uint packageIndex, string packagePath, out string errorMessage)
+            {
+                errorMessage = string.Empty;
+                try
+                {
+                    // Some packages can trigger exceptions inside s4pi's FindAll().
+                    // Iterating the resource list once is faster and more robust.
+                    foreach (IResourceIndexEntry ires in package.GetResourceList)
+                    {
+                        if (!resourceTypesToIndex.Contains(ires.ResourceType)) continue;
+
+                        TGI tgi;
+                        if (ires.ResourceType == (uint)ResourceTypes.CASP)
+                        {
+                            tgi = new TGI(ires.ResourceType, 0, ires.Instance);
+                        }
+                        else
+                        {
+                            tgi = new TGI(ires.ResourceType, ires.ResourceGroup, ires.Instance);
+                        }
+
+                        if (!GameTGIs.ContainsKey(tgi))
+                        {
+                            GameTGIs.Add(tgi, packageIndex);
+                        }
+                    }
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    errorMessage = FormatPackageOpenError(packagePath, ex);
+                    return false;
+                }
+            }
 
             string TS4FilesPath = Properties.Settings.Default.TS4Path;
             var pathRoots = new List<string>() { TS4FilesPath };             
@@ -183,28 +281,8 @@ namespace TS4SimRipper
                 return false;
             }
 
-            // Predicate<IResourceIndexEntry> testPred = r => r.ResourceType == (uint)ResourceTypes.Rig;
-            Predicate<IResourceIndexEntry>[] gamePreds = new Predicate<IResourceIndexEntry>[]
-            {
-                new Predicate<IResourceIndexEntry>(r => r.ResourceType == (uint)ResourceTypes.Sculpt),
-                new Predicate<IResourceIndexEntry>(r => r.ResourceType == (uint)ResourceTypes.SimModifier),
-                new Predicate<IResourceIndexEntry>(r => r.ResourceType == (uint)ResourceTypes.BlendGeometry),
-                new Predicate<IResourceIndexEntry>(r => r.ResourceType == (uint)ResourceTypes.DeformerMap),
-                new Predicate<IResourceIndexEntry>(r => r.ResourceType == (uint)ResourceTypes.BoneDelta),
-                new Predicate<IResourceIndexEntry>(r => r.ResourceType == (uint)ResourceTypes.CASP),
-                new Predicate<IResourceIndexEntry>(r => r.ResourceType == (uint)ResourceTypes.GEOM),
-                new Predicate<IResourceIndexEntry>(r => r.ResourceType == (uint)ResourceTypes.RMap),
-                new Predicate<IResourceIndexEntry>(r => r.ResourceType == (uint)ResourceTypes.RLE2),
-                new Predicate<IResourceIndexEntry>(r => r.ResourceType == (uint)ResourceTypes.RLES),
-                new Predicate<IResourceIndexEntry>(r => r.ResourceType == (uint)ResourceTypes.LRLE),
-                new Predicate<IResourceIndexEntry>(r => r.ResourceType == (uint)ResourceTypes.DDS),
-                new Predicate<IResourceIndexEntry>(r => r.ResourceType == (uint)ResourceTypes.DDSuncompressed),
-                new Predicate<IResourceIndexEntry>(r => r.ResourceType == (uint)ResourceTypes.TONE),
-                new Predicate<IResourceIndexEntry>(r => r.ResourceType == (uint)ResourceTypes.PeltLayer),
-                new Predicate<IResourceIndexEntry>(r => r.ResourceType == (uint)ResourceTypes.Rig),
-                new Predicate<IResourceIndexEntry>(r => r.ResourceType == (uint)ResourceTypes.Tuning1),
-                new Predicate<IResourceIndexEntry>(r => r.ResourceType == (uint)ResourceTypes.Tuning2)
-            };
+            // We can estimate total packages once we know mods/content counts.
+            Report("Preparing package list", null);
 
             uint index = 0;
 
@@ -226,48 +304,42 @@ namespace TS4SimRipper
                 ccPaths = new List<string>(localCC);
                 // ccPaths.Sort((a, b) => b.CompareTo(a));     //descending sort
                 ccPaths.Sort();
+
+                total = ccPaths.Count + paths.Count;
+                Report("Scanning mod packages", null);
                 for (int i = 0; i < ccPaths.Count; i++)
                 {
                     try
                     {
+                        Report("Scanning mod packages", Path.GetFileName(ccPaths[i]));
                         Package p = OpenPackage(ccPaths[i], false);
                         if (p == null)
                         {
                             err += ccPaths[i] + " is NULL" + Environment.NewLine;
                             ccPaths[i] = null;
+                            processed++;
                             continue;
                         }
-                        //IResourceIndexEntry testIrie = p.Find(testPred);
-                        foreach (Predicate<IResourceIndexEntry> pred in gamePreds)
+
+                        if (!TryIndexPackageResources(p, index, ccPaths[i], out string indexError))
                         {
-                            List<IResourceIndexEntry> tmp = p.FindAll(pred);
-                            foreach (IResourceIndexEntry ires in tmp)
-                            {
-                                TGI tgi;
-                                if (ires.ResourceType == (uint)ResourceTypes.CASP)
-                                {
-                                    tgi = new TGI(ires.ResourceType, 0, ires.Instance);
-                                }
-                                else
-                                {
-                                    tgi = new TGI(ires.ResourceType, ires.ResourceGroup, ires.Instance);
-                                }
-                                if (!GameTGIs.ContainsKey(tgi))
-                                {
-                                    GameTGIs.Add(tgi, index);
-                                }
-                            }
+                            err += indexError;
+                            ccPaths[i] = null;
+                            processed++;
+                            continue;
                         }
                         //ccPacks.Add(p);
                         //isCC.Add(true);
                         gamePacks.Add(p);
                         notBase.Add(true);
                         index++;
+                        processed++;
                     }
                     catch (Exception e)
                     {
-                        err += ccPaths[i] + " : " + e.Message + Environment.NewLine;
+                        err += FormatPackageOpenError(ccPaths[i], e);
                         ccPaths[i] = null;
+                        processed++;
                     }
                 }
                 if (err.Length > 0) MessageBox.Show("Unable to open the following mod packages:" + Environment.NewLine + err);
@@ -293,46 +365,40 @@ namespace TS4SimRipper
             {
                 contentPaths = new List<string>(content);
                 contentPaths.Sort();
+
+                total = processed + contentPaths.Count + paths.Count;
+                Report("Scanning SDX content packages", null);
                 for (int i = 0; i < contentPaths.Count; i++)
                 {
                     try
                     {
+                        Report("Scanning SDX content packages", Path.GetFileName(contentPaths[i]));
                         Package p = OpenPackage(contentPaths[i], false);
                         if (p == null)
                         {
                             err += contentPaths[i] + " is NULL" + Environment.NewLine;
                             contentPaths[i] = null;
+                            processed++;
                             continue;
                         }
-                        //IResourceIndexEntry testIrie = p.Find(testPred);
-                        foreach (Predicate<IResourceIndexEntry> pred in gamePreds)
+
+                        if (!TryIndexPackageResources(p, index, contentPaths[i], out string indexError))
                         {
-                            List<IResourceIndexEntry> tmp = p.FindAll(pred);
-                            foreach (IResourceIndexEntry ires in tmp)
-                            {
-                                TGI tgi;
-                                if (ires.ResourceType == (uint)ResourceTypes.CASP)
-                                {
-                                    tgi = new TGI(ires.ResourceType, 0, ires.Instance);
-                                }
-                                else
-                                {
-                                    tgi = new TGI(ires.ResourceType, ires.ResourceGroup, ires.Instance);
-                                }
-                                if (!GameTGIs.ContainsKey(tgi))
-                                {
-                                    GameTGIs.Add(tgi, index);
-                                }
-                            }
+                            err += indexError;
+                            contentPaths[i] = null;
+                            processed++;
+                            continue;
                         }
                         gamePacks.Add(p);
                         notBase.Add(true);
                         index++;
+                        processed++;
                     }
                     catch (Exception e)
                     {
-                        err += contentPaths[i] + " : " + e.Message + Environment.NewLine;
+                        err += FormatPackageOpenError(contentPaths[i], e);
                         contentPaths[i] = null;
+                        processed++;
                     }
                 }
                 if (err.Length > 0) MessageBox.Show("Unable to open the following SDX content packages:" + Environment.NewLine + err);
@@ -344,41 +410,44 @@ namespace TS4SimRipper
 
             try         //add EA packages
             {
+                total = processed + paths.Count;
+                Report("Scanning EA game packages", null);
                 for (int i = 0; i < paths.Count; i++)
                 {
                     try
                     {
+                        Report("Scanning EA game packages", Path.GetFileName(paths[i]));
                         Package p = OpenPackage(paths[i], false);
                         if (p == null)
                         {
                             err += paths[i] + " is NULL" + Environment.NewLine;
                             paths[i] = null;
+                            processed++;
                             continue;
                         }
-                        //IResourceIndexEntry testIrie = p.Find(testPred);
-                        foreach (Predicate<IResourceIndexEntry> pred in gamePreds)
+
+                        if (!TryIndexPackageResources(p, index, paths[i], out string indexError))
                         {
-                            List<IResourceIndexEntry> tmp = p.FindAll(pred);
-                            foreach (IResourceIndexEntry ires in tmp)
-                            {
-                                TGI tgi = new TGI(ires.ResourceType, ires.ResourceGroup, ires.Instance);
-                                if (!GameTGIs.ContainsKey(tgi))
-                                {
-                                    GameTGIs.Add(tgi,index);
-                                }
-                            }
+                            err += indexError;
+                            paths[i] = null;
+                            processed++;
+                            continue;
                         }
                         gamePacks.Add(p);
                         notBase.Add(!paths[i].Contains("\\Data\\"));
                         index++;
+                        processed++;
                     }
                     catch (Exception e)
                     {
-                        err += paths[i] + " : " + e.Message + Environment.NewLine;
+                        err += FormatPackageOpenError(paths[i], e);
                         paths[i] = null;
+                        processed++;
                     }
                 }
                 if (err.Length > 0) MessageBox.Show("Unable to open the following game packages:" + Environment.NewLine + err);
+
+                Report("Finalizing", null);
 
                 if (debug) MessageBox.Show("Set up EA game packages");
 

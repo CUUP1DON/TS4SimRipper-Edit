@@ -446,6 +446,7 @@ namespace TS4SimRipper
         DAE = 2,
         MS3D = 3,
         GEOM = 4,
+        FBX = 5,
     }
 
     public enum MeshFormatFlag

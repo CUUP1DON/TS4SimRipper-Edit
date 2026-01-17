@@ -34,6 +34,18 @@ namespace TS4SimRipper
         Viewport3D myViewport = new Viewport3D();
         MaterialGroup myMaterial = new MaterialGroup();
 
+        // Mouse rotation state tracking
+        private bool _isRotating = false;
+        private Point _lastMousePosition;
+        private double _currentXRotation = 0;
+        private double _currentYRotation = 0;
+        private const double MOUSE_SENSITIVITY = 0.5; // degrees per pixel
+
+        // Mouse panning state tracking
+        private bool _isPanning = false;
+        private Point _lastPanPosition;
+        private const double PAN_SENSITIVITY = 0.005; // camera units per pixel (slower than before)
+
         public MorphPreview()
         {
             InitializeComponent();
@@ -65,6 +77,14 @@ namespace TS4SimRipper
             myViewport.Width = 480;
             myViewport.Camera.Transform = cameraTransform;
             this.canvas1.Children.Insert(0, myViewport);
+
+            // Mouse rotation and zoom event handlers
+            myViewport.MouseDown += Viewport_MouseDown;
+            myViewport.MouseMove += Viewport_MouseMove;
+            myViewport.MouseUp += Viewport_MouseUp;
+            myViewport.MouseLeave += Viewport_MouseLeave;
+            myViewport.MouseEnter += Viewport_MouseEnter;
+            myViewport.MouseWheel += Viewport_MouseWheel;
 
             Canvas.SetTop(myViewport, 0);
             Canvas.SetLeft(myViewport, 0);
@@ -249,11 +269,171 @@ namespace TS4SimRipper
         private void sliderYRot_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             rot_y.Angle = sliderYRot.Value;
+            _currentYRotation = sliderYRot.Value; // Keep mouse tracking in sync
         }
 
         private void sliderXRot_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             rot_x.Angle = sliderXRot.Value;
+            _currentXRotation = sliderXRot.Value; // Keep mouse tracking in sync
+        }
+
+        private void Viewport_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                _isRotating = true;
+                _lastMousePosition = e.GetPosition(myViewport);
+                myViewport.CaptureMouse(); // Ensures events continue if cursor leaves viewport
+                myViewport.Cursor = Cursors.SizeAll;
+                e.Handled = true;
+            }
+            else if (e.MiddleButton == MouseButtonState.Pressed)
+            {
+                _isPanning = true;
+                _lastPanPosition = e.GetPosition(myViewport);
+                myViewport.CaptureMouse(); // Ensures events continue if cursor leaves viewport
+                myViewport.Cursor = Cursors.Hand;
+                e.Handled = true;
+            }
+        }
+
+        private void Viewport_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (_isRotating)
+            {
+                Point currentPosition = e.GetPosition(myViewport);
+                double deltaX = currentPosition.X - _lastMousePosition.X;
+                double deltaY = currentPosition.Y - _lastMousePosition.Y;
+
+                // Horizontal movement rotates around Y-axis, vertical around X-axis
+                _currentYRotation += deltaX * MOUSE_SENSITIVITY;
+                _currentXRotation += deltaY * MOUSE_SENSITIVITY; // Inverted: drag down = rotate down
+
+                // Normalize angles to -180 to 180 range
+                _currentYRotation = NormalizeAngle(_currentYRotation);
+                _currentXRotation = NormalizeAngle(_currentXRotation);
+
+                // Apply rotations
+                rot_y.Angle = _currentYRotation;
+                rot_x.Angle = _currentXRotation;
+
+                // Update sliders to reflect current rotation (two-way sync)
+                sliderYRot.Value = _currentYRotation;
+                sliderXRot.Value = _currentXRotation;
+
+                _lastMousePosition = currentPosition;
+                e.Handled = true;
+            }
+            else if (_isPanning)
+            {
+                Point currentPosition = e.GetPosition(myViewport);
+                double deltaX = currentPosition.X - _lastPanPosition.X;
+                double deltaY = currentPosition.Y - _lastPanPosition.Y;
+
+                // Move camera based on mouse delta (inverted both axes)
+                // Drag right = pan left, Drag down = pan up (both inverted)
+                double newXMove = sliderXMove.Value + (deltaX * PAN_SENSITIVITY); // Inverted: drag right = pan left
+                double newYMove = sliderYMove.Value - (deltaY * PAN_SENSITIVITY); // Inverted: drag down = pan up
+
+                // Clamp to slider limits
+                newXMove = Math.Max(-2.5, Math.Min(2.5, newXMove));
+                newYMove = Math.Max(-3, Math.Min(3, newYMove));
+
+                // Update sliders (which will trigger position update)
+                sliderXMove.Value = newXMove;
+                sliderYMove.Value = newYMove;
+
+                _lastPanPosition = currentPosition;
+                e.Handled = true;
+            }
+        }
+
+        private void Viewport_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (_isRotating && e.LeftButton == MouseButtonState.Released)
+            {
+                _isRotating = false;
+                myViewport.ReleaseMouseCapture();
+                myViewport.Cursor = Cursors.Arrow; // Restore default
+                e.Handled = true;
+            }
+            else if (_isPanning && e.MiddleButton == MouseButtonState.Released)
+            {
+                _isPanning = false;
+                myViewport.ReleaseMouseCapture();
+                myViewport.Cursor = Cursors.Arrow; // Restore default
+                e.Handled = true;
+            }
+        }
+
+        private void Viewport_MouseLeave(object sender, MouseEventArgs e)
+        {
+            // Mouse capture maintains drag even outside viewport
+            // Cleanup happens on MouseUp
+        }
+
+        private void Viewport_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (!_isRotating && !_isPanning)
+            {
+                myViewport.Cursor = Cursors.SizeAll; // 4-way arrow rotation indicator
+            }
+        }
+
+        private double NormalizeAngle(double angle)
+        {
+            // Keep angle within -180 to 180 range
+            while (angle > 180) angle -= 360;
+            while (angle < -180) angle += 360;
+            return angle;
+        }
+
+        private void Viewport_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            // Calculate new zoom value based on wheel delta
+            // Positive delta = zoom in (decrease zoom value), negative = zoom out (increase zoom value)
+            const double ZOOM_SPEED = 0.001; // Adjust sensitivity as needed
+            double currentZoom = sliderZoom.Value;
+            double zoomChange = e.Delta * ZOOM_SPEED; // Positive: scroll up = zoom in
+
+            double newZoom = currentZoom + zoomChange;
+
+            // Clamp to slider limits (-6 to -0.01)
+            newZoom = Math.Max(-6, Math.Min(-0.01, newZoom));
+
+            // Update slider (which will trigger sliderZoom_ValueChanged)
+            sliderZoom.Value = newZoom;
+
+            e.Handled = true;
+        }
+
+        private void ToggleSlidersButton_Checked(object sender, RoutedEventArgs e)
+        {
+            // Sliders become visible automatically via binding
+        }
+
+        private void ToggleSlidersButton_Unchecked(object sender, RoutedEventArgs e)
+        {
+            // Sliders become hidden automatically via binding
+        }
+
+        private void ResetViewButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Reset all rotations to front-facing view
+            _currentXRotation = 0;
+            _currentYRotation = 0;
+            rot_x.Angle = 0;
+            rot_y.Angle = 0;
+            sliderXRot.Value = 0;
+            sliderYRot.Value = 0;
+
+            // Reset camera position (panning)
+            sliderXMove.Value = 0;
+            sliderYMove.Value = 0;
+
+            // Reset zoom to default
+            sliderZoom.Value = -3;
         }
     }
 }

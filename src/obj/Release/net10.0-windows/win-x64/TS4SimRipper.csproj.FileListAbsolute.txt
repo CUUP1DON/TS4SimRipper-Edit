@@ -1,0 +1,106 @@
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\TS4SimRipper.exe
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\S4_AdultCat_RIG.grannyrig
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\S4_AdultDog_RIG.grannyrig
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\S4_AdultFox_RIG.grannyrig
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\S4_AdultHorse_RIG.grannyrig
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\S4_AdultLittleDog_RIG.grannyrig
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\S4_Adult_RIG.grannyrig
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\S4_ChildCat_RIG.grannyrig
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\S4_ChildDog_RIG.grannyrig
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\S4_ChildHorse_RIG.grannyrig
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\S4_Child_RIG.grannyrig
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\S4_Toddler_RIG.grannyrig
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\CASModifierTuning.package
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\squishinterface_Win32.dll
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\squishinterface_x64.dll
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\TS4SimRipper.dll.config
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\TS4SimRipper.deps.json
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\TS4SimRipper.runtimeconfig.json
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\TS4SimRipper.dll
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\Ookii.Dialogs.Wpf.dll
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\protobuf-net.dll
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\protobuf-net.Core.dll
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\DDSPanel.dll
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\s4pi.ImageResource.dll
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\s4pi.Interfaces.dll
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\s4pi.Package.dll
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\s4pi.Settings.dll
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\s4pi.StblResource.dll
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\System.Custom.dll
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\System.Custom.xml
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.csproj.AssemblyReference.cache
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.csproj.SuggestedBindingRedirects.cache
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.dll.config
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\MorphPreview.baml
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\MorphPreview.g.cs
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper_Content.g.cs
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper_MarkupCompile.cache
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.g.resources
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.Form1.resources
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.ListingForm.resources
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.PathsPrompt.resources
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.Properties.Resources.resources
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.StartMessage.resources
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.csproj.GenerateResource.cache
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.GeneratedMSBuildEditorConfig.editorconfig
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.AssemblyInfoInputs.cache
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.AssemblyInfo.cs
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.csproj.CoreCompileInputs.cache
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRi.2B90052B.Up2Date
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.dll
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\refint\TS4SimRipper.dll
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.genruntimeconfig.cache
+d:\Custom Content Creation\Programs\CmarNYC_TS4SimRipper_3_14_2_9\SimRipper Fixer Part 2\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\ref\TS4SimRipper.dll
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\TS4SimRipper.exe
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\S4_AdultCat_RIG.grannyrig
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\S4_AdultDog_RIG.grannyrig
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\S4_AdultFox_RIG.grannyrig
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\S4_AdultHorse_RIG.grannyrig
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\S4_AdultLittleDog_RIG.grannyrig
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\S4_Adult_RIG.grannyrig
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\S4_ChildCat_RIG.grannyrig
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\S4_ChildDog_RIG.grannyrig
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\S4_ChildHorse_RIG.grannyrig
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\S4_Child_RIG.grannyrig
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\S4_Toddler_RIG.grannyrig
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\CASModifierTuning.package
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\squishinterface_Win32.dll
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\squishinterface_x64.dll
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\TS4SimRipper.dll.config
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\TS4SimRipper.deps.json
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\TS4SimRipper.runtimeconfig.json
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\TS4SimRipper.dll
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\Ookii.Dialogs.Wpf.dll
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\protobuf-net.dll
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\protobuf-net.Core.dll
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\DDSPanel.dll
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\s4pi.ImageResource.dll
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\s4pi.Interfaces.dll
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\s4pi.Package.dll
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\s4pi.Settings.dll
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\s4pi.StblResource.dll
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\System.Custom.dll
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\bin\Release\net10.0-windows\win-x64\System.Custom.xml
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.csproj.AssemblyReference.cache
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.csproj.SuggestedBindingRedirects.cache
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.dll.config
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\MorphPreview.baml
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\MorphPreview.g.cs
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper_Content.g.cs
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper_MarkupCompile.cache
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.g.resources
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.Form1.resources
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.ListingForm.resources
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.PathsPrompt.resources
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.Properties.Resources.resources
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.StartMessage.resources
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.csproj.GenerateResource.cache
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.GeneratedMSBuildEditorConfig.editorconfig
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.AssemblyInfoInputs.cache
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.AssemblyInfo.cs
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.csproj.CoreCompileInputs.cache
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRi.2B90052B.Up2Date
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.dll
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\refint\TS4SimRipper.dll
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\TS4SimRipper.genruntimeconfig.cache
+D:\Custom Content Creation\1-800-CUUPID & CUUPID CORP\Blender Addons\TS4 Ripper Fixer\TS4 Sim Ripper\TS4 SimRipper\src\obj\Release\net10.0-windows\win-x64\ref\TS4SimRipper.dll

@@ -19,7 +19,7 @@ namespace TS4SimRipper
 {
     public partial class Form1 : Form
     {
-        string version = "TS4 SimRipper Classic v" + typeof(Form1).Assembly.GetName().Version.ToString();
+        string version = "SimRipperEdit v" + typeof(Form1).Assembly.GetName().Version.ToString();
         ulong[] frameIDMtF4male = new ulong[] { 0x27FE2BD7D11FDE65UL, 0x7A9D44AB67D00802UL };
         ulong[] frameIDMtF4female = new ulong[] { 0xA1A3F64ED26BCED8UL, 0x8ABEBBC4544AAE5BUL };
         ulong[] frameIDFtM = new ulong[] { 0x73290F92433C9DCCUL, 0xBD2A4BDE5C973977UL };
@@ -34,6 +34,7 @@ namespace TS4SimRipper
         static string OBJfilter = "OBJ files (*.obj)|*.obj|All files (*.*)|*.*";
         static string MS3Dfilter = "Milkshape MS3D files (*.ms3d)|*.ms3d|All files (*.*)|*.*";
         static string DAEfilter = "Collada .dae files (*.dae)|*.dae|All files (*.*)|*.*";
+        static string FBXfilter = "FBX files (*.fbx)|*.fbx|All files (*.*)|*.*";
         static string Imagefilter = "PNG files (*.png)|*.png|All files (*.*)|*.*";
         static string SIMOfilter = "Sim Info/Outfit files (*.simo)|*.simo|All files (*.*)|*.*";
         string[] physiqueNamesHuman;
@@ -77,6 +78,8 @@ namespace TS4SimRipper
             bool debug = false;
             StartMessage starter = new StartMessage();
             starter.Show();
+            starter.SetIndeterminate("Starting...");
+            Application.DoEvents();
             this.Text = version;
             physiqueNamesHuman = new string[] { "Body_Heavy", "Body_Fit", "Body_Lean", "Body_Bony", "Body_Pregnant", "Hips_Wide", "Hips_Narrow", "Waist_Wide", "Waist_Narrow" };
             physiqueNamesAnimal = new string[] { "headModifier_Body_Fat", "headModifier_Body_Fit", "headModifier_Body_Skinny", "headModifier_Body_Bony",
@@ -92,10 +95,12 @@ namespace TS4SimRipper
 
             if (debug) MessageBox.Show("Detected file paths");
 
-            if (SetupGamePacks(debug))
+            if (SetupGamePacks(debug, starter))
             {
                 try
                 {
+                    starter.SetIndeterminate("Loading frame morphs...");
+                    Application.DoEvents();
                     startupErrors = "";
                     ulong flatID = FNVhash.FNV64("yfheadChest_Small");
                     BOND flatten = FetchGameBOND(new TGI((uint)ResourceTypes.BoneDelta, 0, flatID), ref startupErrors);
@@ -125,6 +130,8 @@ namespace TS4SimRipper
 
             try
             {
+                starter.SetIndeterminate("Loading CAS tuning...");
+                Application.DoEvents();
                 CASTuning = new CASModifierTuning(gamePackages, gamePackageNames, notBaseGame, this);
             }
             catch (Exception e)
@@ -320,6 +327,48 @@ namespace TS4SimRipper
             }
         }
 
+        private bool EnsureSaveLoaded(string actionTitle)
+        {
+            if (currentSaveGame != null) return true;
+
+            ErrorReporter.ShowWarning(this,
+                actionTitle,
+                "Load a save game first.\n\nClick the Select button next to the save file, then choose a Sim from the list.");
+            return false;
+        }
+
+        private bool EnsureSimSelected(string actionTitle)
+        {
+            if (!EnsureSaveLoaded(actionTitle)) return false;
+
+            if (currentSim != null && sims_listBox.SelectedItem != null) return true;
+
+            ErrorReporter.ShowWarning(this,
+                actionTitle,
+                "Select a Sim first.\n\nLoad a save game, then pick a Sim from the list on the left.");
+            return false;
+        }
+
+        private bool HasAnyModelLoaded()
+        {
+            bool hasCurrent = CurrentModel != null && CurrentModel.Any(m => m != null);
+            bool hasGlass = GlassModel != null && GlassModel.Any(m => m != null);
+            bool hasWings = WingsModel != null && WingsModel.Any(m => m != null);
+            return hasCurrent || hasGlass || hasWings;
+        }
+
+        private bool EnsureModelLoaded(string actionTitle)
+        {
+            if (!EnsureSimSelected(actionTitle)) return false;
+
+            if (!string.IsNullOrWhiteSpace(currentName) && HasAnyModelLoaded()) return true;
+
+            ErrorReporter.ShowWarning(this,
+                actionTitle,
+                "No model is currently loaded to save.\n\nSelect a Sim (and an outfit, if applicable) and wait for the preview to finish loading, then try again.");
+            return false;
+        }
+
         internal class OutfitInfo
         {
             internal CASP[] casps;
@@ -337,13 +386,15 @@ namespace TS4SimRipper
 
         private void sims_listBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            TS4SaveGame.SimData sim = ((SimListing)sims_listBox.SelectedItem).sim;
-            currentSim = sim;
-            if (sim == null)
+            var listing = sims_listBox.SelectedItem as SimListing;
+            if (listing == null || listing.sim == null)
             {
-                MessageBox.Show("Selected sim is null!");
+                currentSim = null;
                 return;
             }
+
+            TS4SaveGame.SimData sim = listing.sim;
+            currentSim = sim;
             currentName = sim.first_name + " " + sim.last_name;
             currentSpecies = (Species)sim.extended_species;
             if (sim.extended_species == 0) currentSpecies = Species.Human;
@@ -453,7 +504,14 @@ namespace TS4SimRipper
                 Pregnancy_trackBar.Enabled = false;
             }
 
-            DisplaySim(sim, currentOccult);
+            try
+            {
+                DisplaySim(sim, currentOccult);
+            }
+            catch (Exception ex)
+            {
+                ErrorReporter.ShowError(this, "Load Sim", "Could not load the selected Sim.", ex);
+            }
         }
 
         //private class CCPackage
@@ -496,9 +554,12 @@ namespace TS4SimRipper
             LogMe(log, "SimRipper V" + version + " log " + DateTime.Now.ToString());
             LogMe(log, sim.first_name + " " + sim.last_name + " Outfit: " + sim.current_outfit_index.ToString() + " Occult: " + occultState.ToString());
             TroubleshootPackageBasic = (Package)Package.NewPackage(0);
-            Working_label.Visible = true;
-            Working_label.Refresh();
             string info = "";
+
+            BusyScope busyScope = null;
+            try
+            {
+                busyScope = new BusyScope(this, Working_label);
             //  Package testpack = (Package)Package.NewPackage(1);
 
             ulong[] sculpts = new ulong[0];
@@ -1126,6 +1187,16 @@ namespace TS4SimRipper
             morphPreview1.Stop_Mesh();
             morphPreview1.Start_Mesh(CurrentModel, GlassModel, WingsModel, currentTexture, currentClothingSpecular,
                 currentGlassTexture, currentGlassSpecular, currentWingsTexture, currentWingsSpecular, true, SeparateMeshesByShader);
+
+            }
+            catch (Exception ex)
+            {
+                ErrorReporter.ShowError(this, "Load Sim", "An error occurred while building the Sim preview.", ex);
+            }
+            finally
+            {
+                busyScope?.Dispose();
+            }
         }
 
         private class SculptOrder
@@ -1213,8 +1284,8 @@ namespace TS4SimRipper
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Error: Could not write file " + saveFileDialog1.FileName + ". Original error: " + ex.Message + Environment.NewLine + ex.StackTrace.ToString());
-                    myStream.Close();
+                    ErrorReporter.ShowError(null, title, "Could not write file:" + Environment.NewLine + saveFileDialog1.FileName, ex);
+                    myStream?.Close();
                 }
                 return saveFileDialog1.FileName;
             }
@@ -1252,8 +1323,8 @@ namespace TS4SimRipper
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Error: Could not write file " + saveFileDialog1.FileName + ". Original error: " + ex.Message + Environment.NewLine + ex.StackTrace.ToString());
-                    myStream.Close();
+                    ErrorReporter.ShowError(null, title, "Could not write file:" + Environment.NewLine + saveFileDialog1.FileName, ex);
+                    myStream?.Close();
                 }
                 return saveFileDialog1.FileName;
             }
@@ -1291,8 +1362,8 @@ namespace TS4SimRipper
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Error: Could not write file " + saveFileDialog1.FileName + ". Original error: " + ex.Message + Environment.NewLine + ex.StackTrace.ToString());
-                    myStream.Close();
+                    ErrorReporter.ShowError(null, title, "Could not write file:" + Environment.NewLine + saveFileDialog1.FileName, ex);
+                    myStream?.Close();
                 }
                 return saveFileDialog1.FileName;
             }
@@ -1319,7 +1390,33 @@ namespace TS4SimRipper
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 float boneDivider = ((10f - (float)BoneSize_numericUpDown.Value) / 4f) * 100f;
-                dae.Write(saveFileDialog1.FileName, flipYZ, boneDivider, LinkTexture_checkBox.Checked ,SeparateMeshesByShader&& hasGlass, SeparateMeshesByShader && hasWings);
+                dae.Write(saveFileDialog1.FileName, flipYZ, boneDivider, LinkTexture_checkBox.Checked, hasGlass, hasWings);
+                return saveFileDialog1.FileName;
+            }
+            else
+            {
+                return "";
+            }
+        }
+
+        internal string WriteFBXFile(string title, FBX fbx, bool flipYZ, string path, string basename)
+        {
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+            saveFileDialog1.Filter = FBXfilter;
+            saveFileDialog1.FilterIndex = 1;
+            saveFileDialog1.Title = title;
+            saveFileDialog1.AddExtension = true;
+            saveFileDialog1.CheckPathExists = true;
+            saveFileDialog1.DefaultExt = "fbx";
+            saveFileDialog1.OverwritePrompt = true;
+            string defaultFilename = path + "\\" + basename;
+            var hasGlass = this.GlassModel.Any(x => x != null);
+            var hasWings = this.WingsModel.Any(x => x != null);
+            if (defaultFilename != null && String.CompareOrdinal(defaultFilename, " ") > 0) saveFileDialog1.FileName = defaultFilename;
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                float boneDivider = ((10f - (float)BoneSize_numericUpDown.Value) / 4f) * 100f;
+                fbx.Write(saveFileDialog1.FileName, flipYZ, boneDivider, LinkTexture_checkBox.Checked, hasGlass, hasWings);
                 return saveFileDialog1.FileName;
             }
             else
@@ -1356,8 +1453,8 @@ namespace TS4SimRipper
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Error: Could not write file " + saveFileDialog1.FileName + ". Original error: " + ex.Message + Environment.NewLine + ex.StackTrace.ToString());
-                    myStream.Close();
+                    ErrorReporter.ShowError(null, title, "Could not write file:" + Environment.NewLine + saveFileDialog1.FileName, ex);
+                    myStream?.Close();
                 }
                 return saveFileDialog1.FileName;
             }
@@ -1465,7 +1562,7 @@ namespace TS4SimRipper
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(version + Environment.NewLine + "by cmar" + Environment.NewLine + "Available free from ModTheSims.info");
+            MessageBox.Show(version + Environment.NewLine + "TS4 SimRipper Classic by CmarNYC" + Environment.NewLine + "Originally from ModTheSims.info");
         }
 
         private void setupToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1493,9 +1590,20 @@ namespace TS4SimRipper
             SaveModelMorph(MeshFormat.OBJ);
         }
 
+        private void SaveModel_button_Click(object sender, EventArgs e)
+        {
+            // Unified Save As... dialog that lets the user pick the output format.
+            SaveModelMorph(MeshFormat.None);
+        }
+
         private void SaveDAE_button_Click(object sender, EventArgs e)
         {
             SaveModelMorph(MeshFormat.DAE);
+        }
+
+        private void SaveFBX_button_Click(object sender, EventArgs e)
+        {
+            SaveModelMorph(MeshFormat.FBX);
         }
 
         private void SaveMS3D_button_Click(object sender, EventArgs e)
@@ -1510,6 +1618,7 @@ namespace TS4SimRipper
 
         private void SaveSIMO_button_Click(object sender, EventArgs e)
         {
+            if (!EnsureSimSelected("Save Sim Info/Outfit")) return;
             SimInfo simo = new SimInfo(currentSim, GameTGIs);
             WriteSIMO("Save Sim Info/Outfit resource to file", simo, null);
         }
@@ -1542,21 +1651,44 @@ namespace TS4SimRipper
 
         private void Occults_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-            TS4SaveGame.SimData sim = ((SimListing)sims_listBox.SelectedItem).sim;
+            if (sims_listBox.SelectedItem == null) return;
+            if (Occults_comboBox.SelectedItem == null) return;
+
+            var listing = sims_listBox.SelectedItem as SimListing;
+            if (listing == null || listing.sim == null) return;
+
+            TS4SaveGame.SimData sim = listing.sim;
             currentSim = sim;
-            DisplaySim(sim, (SimOccult)Occults_comboBox.SelectedItem);
+            try
+            {
+                DisplaySim(sim, (SimOccult)Occults_comboBox.SelectedItem);
+            }
+            catch (Exception ex)
+            {
+                ErrorReporter.ShowError(this, "Change Occult", "Could not load the Sim with the selected occult.", ex);
+            }
         }
 
         private void Outfits_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (BaseModel == null) return;
+            if (Outfits_comboBox.SelectedIndex < 0) return;
+
             outfitIndex = Outfits_comboBox.SelectedIndex;
-            Working_label.Visible = true;
-            Working_label.Refresh();
-            morphPreview1.Stop_Mesh();
-            GetCurrentModel();
-            morphPreview1.Start_Mesh(CurrentModel, GlassModel, WingsModel, currentTexture, currentClothingSpecular,
-                currentGlassTexture, currentGlassSpecular, currentWingsTexture, currentWingsSpecular, false, SeparateMeshesByShader);
-            Working_label.Visible = false;
+            using (new BusyScope(this, Working_label))
+            {
+                try
+                {
+                    morphPreview1.Stop_Mesh();
+                    GetCurrentModel();
+                    morphPreview1.Start_Mesh(CurrentModel, GlassModel, WingsModel, currentTexture, currentClothingSpecular,
+                        currentGlassTexture, currentGlassSpecular, currentWingsTexture, currentWingsSpecular, false, SeparateMeshesByShader);
+                }
+                catch (Exception ex)
+                {
+                    ErrorReporter.ShowError(this, "Change Outfit", "Could not update the preview for the selected outfit.", ex);
+                }
+            }
         }
 
         private void Pregnancy_trackBar_Scroll(object sender, EventArgs e)
@@ -1578,61 +1710,96 @@ namespace TS4SimRipper
         {
             if (BaseModel == null) return;
             currentSkinSet = SkinState_comboBox.SelectedIndex;
-            Working_label.Visible = true;
-            Working_label.Refresh();
-            morphPreview1.Stop_Mesh();
-            GetCurrentModel(true);
-            morphPreview1.Start_Mesh(CurrentModel, GlassModel, WingsModel, currentTexture, currentClothingSpecular,
-                currentGlassTexture, currentGlassSpecular,currentWingsTexture,currentWingsSpecular, false, SeparateMeshesByShader);
-            Working_label.Visible = false;
+            using (new BusyScope(this, Working_label))
+            {
+                try
+                {
+                    morphPreview1.Stop_Mesh();
+                    GetCurrentModel(true);
+                    morphPreview1.Start_Mesh(CurrentModel, GlassModel, WingsModel, currentTexture, currentClothingSpecular,
+                        currentGlassTexture, currentGlassSpecular, currentWingsTexture, currentWingsSpecular, false, SeparateMeshesByShader);
+                }
+                catch (Exception ex)
+                {
+                    ErrorReporter.ShowError(this, "Update Skin", "Could not update the preview.", ex);
+                }
+            }
         }
 
         private void TanLines_checkBox_CheckedChanged(object sender, EventArgs e)
         {
             if (BaseModel == null) return;
-            Working_label.Visible = true;
-            Working_label.Refresh();
-            morphPreview1.Stop_Mesh();
-            GetCurrentModel(true);
-            morphPreview1.Start_Mesh(CurrentModel, GlassModel, WingsModel, currentTexture, currentClothingSpecular,
-                currentGlassTexture, currentGlassSpecular, currentWingsTexture, currentWingsSpecular, false, SeparateMeshesByShader);
-            Working_label.Visible = false;
+            using (new BusyScope(this, Working_label))
+            {
+                try
+                {
+                    morphPreview1.Stop_Mesh();
+                    GetCurrentModel(true);
+                    morphPreview1.Start_Mesh(CurrentModel, GlassModel, WingsModel, currentTexture, currentClothingSpecular,
+                        currentGlassTexture, currentGlassSpecular, currentWingsTexture, currentWingsSpecular, false, SeparateMeshesByShader);
+                }
+                catch (Exception ex)
+                {
+                    ErrorReporter.ShowError(this, "Update Skin", "Could not update the preview.", ex);
+                }
+            }
         }
 
         private void SkinBlend_radioButton_CheckedChanged(object sender, EventArgs e)
         {
             if (BaseModel == null) return;
-            Working_label.Visible = true;
-            Working_label.Refresh();
-            morphPreview1.Stop_Mesh();
-            GetCurrentModel(true);
-            morphPreview1.Start_Mesh(CurrentModel, GlassModel, WingsModel, currentTexture, currentClothingSpecular,
-                currentGlassTexture, currentGlassSpecular, currentWingsTexture, currentWingsSpecular, false, SeparateMeshesByShader);
-            Working_label.Visible = false;
+            using (new BusyScope(this, Working_label))
+            {
+                try
+                {
+                    morphPreview1.Stop_Mesh();
+                    GetCurrentModel(true);
+                    morphPreview1.Start_Mesh(CurrentModel, GlassModel, WingsModel, currentTexture, currentClothingSpecular,
+                        currentGlassTexture, currentGlassSpecular, currentWingsTexture, currentWingsSpecular, false, SeparateMeshesByShader);
+                }
+                catch (Exception ex)
+                {
+                    ErrorReporter.ShowError(this, "Update Skin", "Could not update the preview.", ex);
+                }
+            }
         }
 
         private void SkinOverlay_checkBox_CheckedChanged(object sender, EventArgs e)
         {
             if (BaseModel == null) return;
-            Working_label.Visible = true;
-            Working_label.Refresh();
-            morphPreview1.Stop_Mesh();
-            GetCurrentModel(true);
-            morphPreview1.Start_Mesh(CurrentModel, GlassModel, WingsModel, currentTexture, currentClothingSpecular,
-                currentGlassTexture, currentGlassSpecular, currentWingsTexture,currentWingsSpecular, false, SeparateMeshesByShader);
-            Working_label.Visible = false;
+            using (new BusyScope(this, Working_label))
+            {
+                try
+                {
+                    morphPreview1.Stop_Mesh();
+                    GetCurrentModel(true);
+                    morphPreview1.Start_Mesh(CurrentModel, GlassModel, WingsModel, currentTexture, currentClothingSpecular,
+                        currentGlassTexture, currentGlassSpecular, currentWingsTexture, currentWingsSpecular, false, SeparateMeshesByShader);
+                }
+                catch (Exception ex)
+                {
+                    ErrorReporter.ShowError(this, "Update Skin", "Could not update the preview.", ex);
+                }
+            }
         }
 
         private void OverlaySort_comboBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (BaseModel == null) return;
-            Working_label.Visible = true;
-            Working_label.Refresh();
-            morphPreview1.Stop_Mesh();
-            GetCurrentModel(false);
-            morphPreview1.Start_Mesh(CurrentModel, GlassModel, WingsModel, currentTexture, currentClothingSpecular,
-                currentGlassTexture, currentGlassSpecular, currentWingsTexture, currentWingsSpecular, false, SeparateMeshesByShader);
-            Working_label.Visible = false;
+            using (new BusyScope(this, Working_label))
+            {
+                try
+                {
+                    morphPreview1.Stop_Mesh();
+                    GetCurrentModel(false);
+                    morphPreview1.Start_Mesh(CurrentModel, GlassModel, WingsModel, currentTexture, currentClothingSpecular,
+                        currentGlassTexture, currentGlassSpecular, currentWingsTexture, currentWingsSpecular, false, SeparateMeshesByShader);
+                }
+                catch (Exception ex)
+                {
+                    ErrorReporter.ShowError(this, "Update Preview", "Could not update the preview.", ex);
+                }
+            }
         }
 
         private void Form1_Shown(object sender, EventArgs e)
@@ -1644,13 +1811,20 @@ namespace TS4SimRipper
         private void HQSize_radioButton_CheckedChanged(object sender, EventArgs e)
         {
             if (BaseModel == null) return;
-            Working_label.Visible = true;
-            Working_label.Refresh();
-            morphPreview1.Stop_Mesh();
-            GetCurrentModel(false);
-            morphPreview1.Start_Mesh(CurrentModel, GlassModel, WingsModel, currentTexture, currentClothingSpecular,
-                currentGlassTexture, currentGlassSpecular, currentWingsTexture,currentWingsSpecular, false, SeparateMeshesByShader);
-            Working_label.Visible = false;
+            using (new BusyScope(this, Working_label))
+            {
+                try
+                {
+                    morphPreview1.Stop_Mesh();
+                    GetCurrentModel(false);
+                    morphPreview1.Start_Mesh(CurrentModel, GlassModel, WingsModel, currentTexture, currentClothingSpecular,
+                        currentGlassTexture, currentGlassSpecular, currentWingsTexture, currentWingsSpecular, false, SeparateMeshesByShader);
+                }
+                catch (Exception ex)
+                {
+                    ErrorReporter.ShowError(this, "Update Preview", "Could not update the preview.", ex);
+                }
+            }
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)

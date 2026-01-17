@@ -1,0 +1,43 @@
+{
+  "version": 2,
+  "dgSpecHash": "yyCgk7tfhjQ=",
+  "success": true,
+  "projectFilePath": "D:\\Custom Content Creation\\1-800-CUUPID & CUUPID CORP\\Blender Addons\\TS4 Ripper Fixer\\TS4 Sim Ripper\\TS4 SimRipper\\src\\TS4SimRipper.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\DREAMER\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
+    "C:\\Users\\DREAMER\\.nuget\\packages\\microsoft.netcore.targets\\1.1.0\\microsoft.netcore.targets.1.1.0.nupkg.sha512",
+    "C:\\Users\\DREAMER\\.nuget\\packages\\ookii.dialogs.wpf\\5.0.1\\ookii.dialogs.wpf.5.0.1.nupkg.sha512",
+    "C:\\Users\\DREAMER\\.nuget\\packages\\protobuf-net\\3.2.30\\protobuf-net.3.2.30.nupkg.sha512",
+    "C:\\Users\\DREAMER\\.nuget\\packages\\protobuf-net.core\\3.2.30\\protobuf-net.core.3.2.30.nupkg.sha512",
+    "C:\\Users\\DREAMER\\.nuget\\packages\\runtime.native.system\\4.3.0\\runtime.native.system.4.3.0.nupkg.sha512",
+    "C:\\Users\\DREAMER\\.nuget\\packages\\runtime.native.system.io.compression\\4.3.0\\runtime.native.system.io.compression.4.3.0.nupkg.sha512",
+    "C:\\Users\\DREAMER\\.nuget\\packages\\system.io.compression\\4.3.0\\system.io.compression.4.3.0.nupkg.sha512",
+    "C:\\Users\\DREAMER\\.nuget\\packages\\system.resources.extensions\\10.0.0\\system.resources.extensions.10.0.0.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1510",
+      "level": "Warning",
+      "message": "PackageReference System.IO.Compression will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
+      "projectPath": "D:\\Custom Content Creation\\1-800-CUUPID & CUUPID CORP\\Blender Addons\\TS4 Ripper Fixer\\TS4 Sim Ripper\\TS4 SimRipper\\src\\TS4SimRipper.csproj",
+      "warningLevel": 1,
+      "filePath": "D:\\Custom Content Creation\\1-800-CUUPID & CUUPID CORP\\Blender Addons\\TS4 Ripper Fixer\\TS4 Sim Ripper\\TS4 SimRipper\\src\\TS4SimRipper.csproj",
+      "libraryId": "System.IO.Compression",
+      "targetGraphs": [
+        "net10.0-windows7.0"
+      ]
+    },
+    {
+      "code": "NU1510",
+      "level": "Warning",
+      "message": "PackageReference System.Resources.Extensions will not be pruned. Consider removing this package from your dependencies, as it is likely unnecessary.",
+      "projectPath": "D:\\Custom Content Creation\\1-800-CUUPID & CUUPID CORP\\Blender Addons\\TS4 Ripper Fixer\\TS4 Sim Ripper\\TS4 SimRipper\\src\\TS4SimRipper.csproj",
+      "warningLevel": 1,
+      "filePath": "D:\\Custom Content Creation\\1-800-CUUPID & CUUPID CORP\\Blender Addons\\TS4 Ripper Fixer\\TS4 Sim Ripper\\TS4 SimRipper\\src\\TS4SimRipper.csproj",
+      "libraryId": "System.Resources.Extensions",
+      "targetGraphs": [
+        "net10.0-windows7.0"
+      ]
+    }
+  ]
+}

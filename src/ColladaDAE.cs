@@ -803,6 +803,14 @@ namespace TS4SimRipper
                 mesh daemesh = new mesh();
                 if (!texSuffixes.TryGetValue(cmesh.shader, out var texSuffix)) texSuffix = texSuffixes[(uint)SimShader.SimSkin];
 
+                // If the mesh uses a specialized shader but we aren't exporting/linking that texture set,
+                // fall back to base textures so init_from always points at a valid <image>.
+                if ((cmesh.shader == (uint)SimShader.SimGlass && !glassTextures) ||
+                    (cmesh.shader == (uint)SimShader.SimWings && !wingTextures))
+                {
+                    texSuffix = texSuffixes[(uint)SimShader.SimSkin];
+                }
+
                 string matCount = counter.ToString("d3");
                 if (linkTextures)
                 {
@@ -860,9 +868,11 @@ namespace TS4SimRipper
                                     emission = new common_color_or_texture_type() { Item = new common_color_or_texture_typeColor() { sid = "emission", Values = new double[] { 0d, 0d, 0d, 1d } } },
                                     ambient = new common_color_or_texture_type() { Item = new common_color_or_texture_typeColor() { sid = "ambient", Values = new double[] { 0d, 0d, 0d, 1d } } },
                                     diffuse = new common_color_or_texture_type() { Item = new common_color_or_texture_typeTexture() { texture = basename + matCount + "_diffuse_png-sampler", texcoord = "uv_0" } },
-                                    //specular = new common_color_or_texture_type() { Item = new common_color_or_texture_typeColor() { sid = "specular", Values = new double[] { 0.5, 0.5, 0.5, 1d } } },
-                                    specular = new common_color_or_texture_type() { Item = new common_color_or_texture_typeTexture() { texture = basename + matCount + "_specular_png-sampler", texcoord = "uv_0" } },
-                                    shininess = new common_float_or_param_type() { Item = new common_float_or_param_typeFloat() { sid = "shininess", Value = 25d } },
+                                    // Blender: keep specular off by default (specular = 0).
+                                    specular = new common_color_or_texture_type() { Item = new common_color_or_texture_typeColor() { sid = "specular", Values = new double[] { 0d, 0d, 0d, 1d } } },
+                                    // Blender maps Collada Phong shininess to Principled roughness.
+                                    // Setting shininess to 0 gives a fully-rough look (roughness ≈ 1).
+                                    shininess = new common_float_or_param_type() { Item = new common_float_or_param_typeFloat() { sid = "shininess", Value = 0d } },
                                     transparent = new common_transparent_type() { opaque = fx_opaque_enum.A_ONE, Item = new common_color_or_texture_typeTexture() { texture = basename + matCount + "_diffuse_png-sampler", texcoord = "uv_0" } },
                                     index_of_refraction = new common_float_or_param_type() { Item = new common_float_or_param_typeFloat() { sid = "index_of_refraction", Value = 1d } }
                                 }

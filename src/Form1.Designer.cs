@@ -33,9 +33,7 @@
             this.SaveGameFile = new System.Windows.Forms.TextBox();
             this.SaveGameFile_button = new System.Windows.Forms.Button();
             this.sims_listBox = new System.Windows.Forms.ListBox();
-            this.SaveOBJ_button = new System.Windows.Forms.Button();
-            this.SaveDAE_button = new System.Windows.Forms.Button();
-            this.SaveMS3D_button = new System.Windows.Forms.Button();
+            this.SaveModel_button = new System.Windows.Forms.Button();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -137,38 +135,16 @@
             this.sims_listBox.TabIndex = 4;
             this.sims_listBox.SelectedIndexChanged += new System.EventHandler(this.sims_listBox_SelectedIndexChanged);
             // 
-            // SaveOBJ_button
-            // 
-            this.SaveOBJ_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.SaveOBJ_button.Location = new System.Drawing.Point(746, 73);
-            this.SaveOBJ_button.Name = "SaveOBJ_button";
-            this.SaveOBJ_button.Size = new System.Drawing.Size(70, 30);
-            this.SaveOBJ_button.TabIndex = 6;
-            this.SaveOBJ_button.Text = "OBJ";
-            this.SaveOBJ_button.UseVisualStyleBackColor = true;
-            this.SaveOBJ_button.Click += new System.EventHandler(this.SaveOBJ_button_Click);
-            // 
-            // SaveDAE_button
-            // 
-            this.SaveDAE_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.SaveDAE_button.Location = new System.Drawing.Point(912, 73);
-            this.SaveDAE_button.Name = "SaveDAE_button";
-            this.SaveDAE_button.Size = new System.Drawing.Size(70, 30);
-            this.SaveDAE_button.TabIndex = 7;
-            this.SaveDAE_button.Text = "DAE";
-            this.SaveDAE_button.UseVisualStyleBackColor = true;
-            this.SaveDAE_button.Click += new System.EventHandler(this.SaveDAE_button_Click);
-            // 
-            // SaveMS3D_button
-            // 
-            this.SaveMS3D_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.SaveMS3D_button.Location = new System.Drawing.Point(831, 73);
-            this.SaveMS3D_button.Name = "SaveMS3D_button";
-            this.SaveMS3D_button.Size = new System.Drawing.Size(70, 30);
-            this.SaveMS3D_button.TabIndex = 8;
-            this.SaveMS3D_button.Text = "MS3D";
-            this.SaveMS3D_button.UseVisualStyleBackColor = true;
-            this.SaveMS3D_button.Click += new System.EventHandler(this.SaveMS3D_button_Click);
+            // SaveModel_button
+            //
+            this.SaveModel_button.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.SaveModel_button.Location = new System.Drawing.Point(746, 73);
+            this.SaveModel_button.Name = "SaveModel_button";
+            this.SaveModel_button.Size = new System.Drawing.Size(236, 30);
+            this.SaveModel_button.TabIndex = 6;
+            this.SaveModel_button.Text = "Save As...";
+            this.SaveModel_button.UseVisualStyleBackColor = true;
+            this.SaveModel_button.Click += new System.EventHandler(this.SaveModel_button_Click);
             // 
             // menuStrip1
             // 
@@ -523,9 +499,9 @@
             this.SeparateMeshes_comboBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.SeparateMeshes_comboBox.FormattingEnabled = true;
             this.SeparateMeshes_comboBox.Items.AddRange(new object[] {
-            "Single mesh and texture",
-            "All separate meshes, one texture",
-            "Solid and glass meshes and textures"});
+            "Single mesh & texture",
+            "All separate meshes & one texture",
+            "Solid and glass meshes & textures"});
             this.SeparateMeshes_comboBox.Location = new System.Drawing.Point(746, 109);
             this.SeparateMeshes_comboBox.Name = "SeparateMeshes_comboBox";
             this.SeparateMeshes_comboBox.Size = new System.Drawing.Size(236, 21);
@@ -768,7 +744,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(994, 616);
+            this.ClientSize = new System.Drawing.Size(1075, 616);
             this.Controls.Add(this.SaveSIMO_button);
             this.Controls.Add(this.SaveMakeup_button);
             this.Controls.Add(this.SaveEmission_button);
@@ -810,9 +786,7 @@
             this.Controls.Add(this.elementHost1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.Outfits_comboBox);
-            this.Controls.Add(this.SaveMS3D_button);
-            this.Controls.Add(this.SaveDAE_button);
-            this.Controls.Add(this.SaveOBJ_button);
+            this.Controls.Add(this.SaveModel_button);
             this.Controls.Add(this.sims_listBox);
             this.Controls.Add(this.SaveGameFile_button);
             this.Controls.Add(this.SaveGameFile);
@@ -842,9 +816,7 @@
         private System.Windows.Forms.TextBox SaveGameFile;
         private System.Windows.Forms.Button SaveGameFile_button;
         private System.Windows.Forms.ListBox sims_listBox;
-        private System.Windows.Forms.Button SaveOBJ_button;
-        private System.Windows.Forms.Button SaveDAE_button;
-        private System.Windows.Forms.Button SaveMS3D_button;
+        private System.Windows.Forms.Button SaveModel_button;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem setupToolStripMenuItem;

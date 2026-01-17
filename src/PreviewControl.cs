@@ -1601,12 +1601,63 @@ namespace TS4SimRipper
 
         private void SaveModelMorph(MeshFormat format)
         {
-            string savename = "";
-            Working_label.Visible = true;
-            Working_label.Refresh();
-            string path = Properties.Settings.Default.LastSavePath;
-            byte[] tempBytes = System.Text.Encoding.GetEncoding("ISO-8859-8").GetBytes(currentName);
-            string basename = System.Text.Encoding.UTF8.GetString(tempBytes).Replace(" ", "");
+            if (!EnsureModelLoaded("Save Model")) return;
+
+            using (new BusyScope(this, Working_label))
+            {
+                try
+                {
+                    string savename = "";
+                    string path = Properties.Settings.Default.LastSavePath;
+                    byte[] tempBytes = System.Text.Encoding.GetEncoding("ISO-8859-8").GetBytes(currentName);
+                    string basename = System.Text.Encoding.UTF8.GetString(tempBytes).Replace(" ", "");
+
+            // Unified Save As... flow (single button + Windows-style format dropdown).
+            // When format is None, prompt once for both filename and output format.
+            string chosenFileName = null;
+            if (format == MeshFormat.None)
+            {
+                using (SaveFileDialog saveFileDialog1 = new SaveFileDialog())
+                {
+                    saveFileDialog1.Filter = "FBX (*.fbx)|*.fbx|Collada DAE (*.dae)|*.dae|Wavefront OBJ (*.obj)|*.obj|MilkShape3D (*.ms3d)|*.ms3d";
+                    saveFileDialog1.FilterIndex = 1;
+                    saveFileDialog1.Title = "Save morphed model";
+                    saveFileDialog1.AddExtension = true;
+                    saveFileDialog1.CheckPathExists = true;
+                    saveFileDialog1.OverwritePrompt = true;
+                    saveFileDialog1.FileName = Path.Combine(path, basename);
+
+                    if (saveFileDialog1.ShowDialog() != DialogResult.OK)
+                    {
+                        return;
+                    }
+
+                    chosenFileName = saveFileDialog1.FileName;
+                    if (String.IsNullOrWhiteSpace(Path.GetExtension(chosenFileName)))
+                    {
+                        string ext = saveFileDialog1.FilterIndex switch
+                        {
+                            1 => ".fbx",
+                            2 => ".dae",
+                            3 => ".obj",
+                            4 => ".ms3d",
+                            _ => ".fbx",
+                        };
+                        chosenFileName += ext;
+                    }
+
+                    string extLower = Path.GetExtension(chosenFileName).ToLowerInvariant();
+                    format = extLower switch
+                    {
+                        ".fbx" => MeshFormat.FBX,
+                        ".dae" => MeshFormat.DAE,
+                        ".obj" => MeshFormat.OBJ,
+                        ".ms3d" => MeshFormat.MS3D,
+                        _ => MeshFormat.FBX,
+                    };
+                }
+            }
+
             List<GEOM> geomList = new List<GEOM>();
             List<string> nameList = new List<string>();
             if (SingleMesh)     //single mesh
@@ -1715,21 +1766,107 @@ namespace TS4SimRipper
             {
                 OBJ obj = new OBJ(geomList.ToArray(), 0, false, nameList.ToArray());
                 Working_label.Visible = false;
-                savename = WriteOBJFile("Save OBJ of morphed model", obj, path + "\\" + basename);
+                if (chosenFileName != null)
+                {
+                    savename = chosenFileName;
+                    try
+                    {
+                        using (Stream myStream = new FileStream(savename, FileMode.Create, FileAccess.Write, FileShare.None))
+                        using (StreamWriter sw = new StreamWriter(myStream))
+                        {
+                            obj.Write(sw);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ErrorReporter.ShowError(this, "Save Model", "Could not write file:" + Environment.NewLine + savename, ex);
+                        return;
+                    }
+                }
+                else
+                {
+                    savename = WriteOBJFile("Save OBJ of morphed model", obj, path + "\\" + basename);
+                }
                 basename = Path.GetFileNameWithoutExtension(savename);
             }
             else if (format == MeshFormat.MS3D)
             {
                 MS3D ms3d = new MS3D(geomList.ToArray(), currentRig, 0, nameList.ToArray());
                 Working_label.Visible = false;
-                savename = WriteMS3D("Save MS3D of morphed model", ms3d, path + "\\" + basename);
+                if (chosenFileName != null)
+                {
+                    savename = chosenFileName;
+                    try
+                    {
+                        using (Stream myStream = new FileStream(savename, FileMode.Create, FileAccess.Write, FileShare.None))
+                        using (BinaryWriter bw = new BinaryWriter(myStream))
+                        {
+                            ms3d.Write(bw);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ErrorReporter.ShowError(this, "Save Model", "Could not write file:" + Environment.NewLine + savename, ex);
+                        return;
+                    }
+                }
+                else
+                {
+                    savename = WriteMS3D("Save MS3D of morphed model", ms3d, path + "\\" + basename);
+                }
                 basename = Path.GetFileNameWithoutExtension(savename);
             }
             else if (format == MeshFormat.DAE)
             {
                 DAE dae = new DAE(geomList.ToArray(), nameList.ToArray(), currentRig, false, CleanDAE_checkBox.Checked, ref errorList);
                 Working_label.Text = "Saving....";
-                savename = WriteDAEFile("Save Collada DAE of morphed model", dae, false, path, basename);
+                if (chosenFileName != null)
+                {
+                    savename = chosenFileName;
+                    try
+                    {
+                        float boneDivider = ((10f - (float)BoneSize_numericUpDown.Value) / 4f) * 100f;
+                        var hasGlass = this.GlassModel.Any(x => x != null);
+                        var hasWings = this.WingsModel.Any(x => x != null);
+                        dae.Write(savename, false, boneDivider, LinkTexture_checkBox.Checked, hasGlass, hasWings);
+                    }
+                    catch (Exception ex)
+                    {
+                        ErrorReporter.ShowError(this, "Save Model", "Could not write file:" + Environment.NewLine + savename, ex);
+                        return;
+                    }
+                }
+                else
+                {
+                    savename = WriteDAEFile("Save Collada DAE of morphed model", dae, false, path, basename);
+                }
+                Working_label.Text = "Working....";
+                Working_label.Visible = false;
+            }
+            else if (format == MeshFormat.FBX)
+            {
+                FBX fbx = new FBX(geomList.ToArray(), nameList.ToArray(), currentRig, false, CleanDAE_checkBox.Checked, ref errorList);
+                Working_label.Text = "Saving....";
+                if (chosenFileName != null)
+                {
+                    savename = chosenFileName;
+                    try
+                    {
+                        float boneDivider = ((10f - (float)BoneSize_numericUpDown.Value) / 4f) * 100f;
+                        var hasGlass = this.GlassModel.Any(x => x != null);
+                        var hasWings = this.WingsModel.Any(x => x != null);
+                        fbx.Write(savename, false, boneDivider, LinkTexture_checkBox.Checked, hasGlass, hasWings);
+                    }
+                    catch (Exception ex)
+                    {
+                        ErrorReporter.ShowError(this, "Save Model", "Could not write file:" + Environment.NewLine + savename, ex);
+                        return;
+                    }
+                }
+                else
+                {
+                    savename = WriteFBXFile("Save FBX of morphed model", fbx, false, path, basename);
+                }
                 Working_label.Text = "Working....";
                 Working_label.Visible = false;
             }
@@ -1762,15 +1899,12 @@ namespace TS4SimRipper
                 //if (currentSpecular != null) currentSpecular.Save(savename + "_specular.png");
                 //Image currentSpecular = new Bitmap(CurrentSpecular());
                 if (currentSpecular != null) SaveImagePng(currentSpecular, testname);
-                if (SeparateMeshesByShader)
-                {
-                    testname = savename + "_glass_diffuse.png";
-                    if (currentGlassTexture != null) SaveImagePng(currentGlassTexture, testname);
-                    testname = savename + "_glass_specular.png";
-                    if (currentGlassSpecular != null) SaveImagePng(currentGlassSpecular, testname);
-                    //if (currentGlassTexture != null) currentGlassTexture.Save(savename + "_glass_diffuse.png");
-                    //if (currentGlassSpecular != null) currentGlassSpecular.Save(savename + "_glass_specular.png");
-                }
+                // Glass/alpha textures: save whenever present.
+                // Exporters may link these even when meshes are not separated.
+                testname = savename + "_glass_diffuse.png";
+                if (currentGlassTexture != null) SaveImagePng(currentGlassTexture, testname);
+                testname = savename + "_glass_specular.png";
+                if (currentGlassSpecular != null) SaveImagePng(currentGlassSpecular, testname);
                 testname = savename + "_normalmap.png";
                 //if (currentBump != null) currentBump.Save(savename + "_normalmap.png");
                 if (currentBump != null) SaveImagePng(NormalConvert_checkBox.Checked ? ConvertNormalMap(currentBump) : currentBump, testname);
@@ -1784,10 +1918,14 @@ namespace TS4SimRipper
             }
             catch (Exception e)
             {
-                bool dirExist = Directory.Exists(Path.GetDirectoryName(testname));
-                MessageBox.Show("Unable to save image to file: " + testname + Environment.NewLine
-                    + "Directory " + Path.GetDirectoryName(testname) + " exists: " + dirExist.ToString() + Environment.NewLine
-                    + e.ToString());
+                string dir = Path.GetDirectoryName(testname);
+                bool dirExist = Directory.Exists(dir);
+                ErrorReporter.ShowError(this,
+                    "Save Textures",
+                    "Unable to save image to file:" + Environment.NewLine + testname + Environment.NewLine + Environment.NewLine +
+                    "Directory exists: " + dirExist.ToString() + Environment.NewLine +
+                    "Directory: " + dir,
+                    e);
             }
             //if (currentSculptOverlay != null) currentSculptOverlay.Save(savename + "_sculpt.png");
             //if (currentOutfitOverlay != null) currentOutfitOverlay.Save(savename + "_outfit.png");
@@ -1795,51 +1933,67 @@ namespace TS4SimRipper
             Working_label.Visible = false;
             Properties.Settings.Default.LastSavePath = Path.GetDirectoryName(savename);
             Properties.Settings.Default.Save();
+
+                }
+                catch (Exception ex)
+                {
+                    ErrorReporter.ShowError(this, "Save Model", "Could not save the model.", ex);
+                }
+            }
         }
 
         private void SaveTextures_button_Click(object sender, EventArgs e)
         {
-            //Image currentTexture = new Bitmap(CurrentTexture());
-            if (currentTexture == null)
+            if (!EnsureModelLoaded("Save Textures")) return;
+            try
             {
-                MessageBox.Show("There is no diffuse texture for this model!");
-                return;
-            }
-            string path = Properties.Settings.Default.LastSavePath;
-            byte[] tempBytes = System.Text.Encoding.GetEncoding("ISO-8859-8").GetBytes(currentName);
-            string basename = System.Text.Encoding.UTF8.GetString(tempBytes).Replace(" ", "");
-            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
-            saveFileDialog1.Filter = Imagefilter;
-            saveFileDialog1.FilterIndex = 1;
-            saveFileDialog1.AddExtension = true;
-            saveFileDialog1.CheckPathExists = true;
-            saveFileDialog1.DefaultExt = "png";
-            saveFileDialog1.OverwritePrompt = true;
-            saveFileDialog1.Title = "Save Combined Texture";
-            saveFileDialog1.FileName = path + "\\" + basename + "_Diffuse.png";
-            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
-            {
-                if (saveFileDialog1.FileName.Length == 0) return;
-                if (currentTexture != null) SaveImagePng(currentTexture, saveFileDialog1.FileName);
-            }
-            //Image currentSpecular = new Bitmap(CurrentSpecular());
-            if (currentSpecular != null)
-            {
-                saveFileDialog1.Title = "Save Combined Specular";
-                saveFileDialog1.FileName = path + "\\" + basename + "_Specular.png";
+                //Image currentTexture = new Bitmap(CurrentTexture());
+                if (currentTexture == null)
+                {
+                    ErrorReporter.ShowWarning(this, "Save Textures", "There is no diffuse texture for this model.");
+                    return;
+                }
+                string path = Properties.Settings.Default.LastSavePath;
+                byte[] tempBytes = System.Text.Encoding.GetEncoding("ISO-8859-8").GetBytes(currentName);
+                string basename = System.Text.Encoding.UTF8.GetString(tempBytes).Replace(" ", "");
+                SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+                saveFileDialog1.Filter = Imagefilter;
+                saveFileDialog1.FilterIndex = 1;
+                saveFileDialog1.AddExtension = true;
+                saveFileDialog1.CheckPathExists = true;
+                saveFileDialog1.DefaultExt = "png";
+                saveFileDialog1.OverwritePrompt = true;
+                saveFileDialog1.Title = "Save Combined Texture";
+                saveFileDialog1.FileName = path + "\\" + basename + "_Diffuse.png";
                 if (saveFileDialog1.ShowDialog() == DialogResult.OK)
                 {
                     if (saveFileDialog1.FileName.Length == 0) return;
-                    SaveImagePng(currentSpecular, saveFileDialog1.FileName);
+                    if (currentTexture != null) SaveImagePng(currentTexture, saveFileDialog1.FileName);
                 }
+                //Image currentSpecular = new Bitmap(CurrentSpecular());
+                if (currentSpecular != null)
+                {
+                    saveFileDialog1.Title = "Save Combined Specular";
+                    saveFileDialog1.FileName = path + "\\" + basename + "_Specular.png";
+                    if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+                    {
+                        if (saveFileDialog1.FileName.Length == 0) return;
+                        SaveImagePng(currentSpecular, saveFileDialog1.FileName);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorReporter.ShowError(this, "Save Textures", "Could not save textures.", ex);
             }
         }
 
         private void SaveGlass_button_Click(object sender, EventArgs e)
         {
+            if (!EnsureModelLoaded("Save Glass Textures")) return;
             if (currentGlassTexture == null)
             {
-                MessageBox.Show("There is no glass texture for this model!");
+                ErrorReporter.ShowWarning(this, "Save Glass Textures", "There is no glass texture for this model.");
                 return;
             }
             string path = Properties.Settings.Default.LastSavePath;
@@ -1873,9 +2027,10 @@ namespace TS4SimRipper
         }
         private void SaveWings_button_Click(object sender, EventArgs e)
         {
+            if (!EnsureModelLoaded("Save Wing Textures")) return;
             if (currentWingsTexture == null)
             {
-                MessageBox.Show("There is no wing texture for this model!");
+                ErrorReporter.ShowWarning(this, "Save Wing Textures", "There is no wing texture for this model.");
                 return;
             }
             string path = Properties.Settings.Default.LastSavePath;
@@ -1909,9 +2064,10 @@ namespace TS4SimRipper
 
         private void SaveSkin_button_Click(object sender, EventArgs e)
         {
+            if (!EnsureModelLoaded("Save Skin Texture")) return;
             if (currentSkin == null)
             {
-                MessageBox.Show("There is no skin texture for this model!");
+                ErrorReporter.ShowWarning(this, "Save Skin Texture", "There is no skin texture for this model.");
                 return;
             }
             string path = Properties.Settings.Default.LastSavePath;
@@ -1935,9 +2091,10 @@ namespace TS4SimRipper
 
         private void SaveClothing_button_Click(object sender, EventArgs e)
         {
+            if (!EnsureModelLoaded("Save Clothing Textures")) return;
             if (currentClothing == null)
             {
-                MessageBox.Show("There is no clothing texture for this model!");
+                ErrorReporter.ShowWarning(this, "Save Clothing Textures", "There is no clothing texture for this model.");
                 return;
             }
             string path = Properties.Settings.Default.LastSavePath;
@@ -1972,9 +2129,10 @@ namespace TS4SimRipper
 
         private void SaveMakeup_button_Click(object sender, EventArgs e)
         {
+            if (!EnsureModelLoaded("Save Makeup Textures")) return;
             if (currentMakeup == null)
             {
-                MessageBox.Show("There is no makeup texture for this model!");
+                ErrorReporter.ShowWarning(this, "Save Makeup Textures", "There is no makeup texture for this model.");
                 return;
             }
             string path = Properties.Settings.Default.LastSavePath;
@@ -2008,9 +2166,10 @@ namespace TS4SimRipper
 
         private void SaveEmission_button_Click(object sender, EventArgs e)
         {
+            if (!EnsureModelLoaded("Save Emission Map")) return;
             if (currentEmission == null)
             {
-                MessageBox.Show("There is no emission/glow map texture for this model!");
+                ErrorReporter.ShowWarning(this, "Save Emission Map", "There is no emission/glow map texture for this model.");
                 return;
             }
             string path = Properties.Settings.Default.LastSavePath;
@@ -2034,9 +2193,10 @@ namespace TS4SimRipper
 
         private void SaveNormals_button_Click(object sender, EventArgs e)
         {
+            if (!EnsureModelLoaded("Save Normal Map")) return;
             if (currentBump == null)
             {
-                MessageBox.Show("There is no bump/normals map texture for this model!");
+                ErrorReporter.ShowWarning(this, "Save Normal Map", "There is no bump/normals map texture for this model.");
                 return;
             }
             string path = Properties.Settings.Default.LastSavePath;
@@ -2060,83 +2220,107 @@ namespace TS4SimRipper
 
         private void SimTrouble_button_Click(object sender, EventArgs e)
         {
-            string path = Properties.Settings.Default.LastSavePath;
-            byte[] tempBytes = System.Text.Encoding.GetEncoding("ISO-8859-8").GetBytes(currentName);
-            string basename = System.Text.Encoding.UTF8.GetString(tempBytes).Replace(" ", "");
-            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
-            saveFileDialog1.Filter = "ZIP files (*.zip)|*.zip|All files (*.*)|*.*";
-            saveFileDialog1.FilterIndex = 1;
-            saveFileDialog1.Title = "Save zip file with sim CC";
-            saveFileDialog1.AddExtension = true;
-            saveFileDialog1.CheckPathExists = true;
-            saveFileDialog1.DefaultExt = "zip";
-            saveFileDialog1.OverwritePrompt = true;
-            saveFileDialog1.FileName = path + "\\" + basename + "_TroubleShoot.zip";
-            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            if (!EnsureSimSelected("Troubleshoot Zip")) return;
+
+            try
             {
-                if (File.Exists(saveFileDialog1.FileName)) File.Delete(saveFileDialog1.FileName);
-                using (ZipArchive zip = ZipFile.Open(saveFileDialog1.FileName, ZipArchiveMode.Create))
+                string path = Properties.Settings.Default.LastSavePath;
+                byte[] tempBytes = System.Text.Encoding.GetEncoding("ISO-8859-8").GetBytes(currentName);
+                string basename = System.Text.Encoding.UTF8.GetString(tempBytes).Replace(" ", "");
+
+                SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+                saveFileDialog1.Filter = "ZIP files (*.zip)|*.zip|All files (*.*)|*.*";
+                saveFileDialog1.FilterIndex = 1;
+                saveFileDialog1.Title = "Save zip file with sim CC";
+                saveFileDialog1.AddExtension = true;
+                saveFileDialog1.CheckPathExists = true;
+                saveFileDialog1.DefaultExt = "zip";
+                saveFileDialog1.OverwritePrompt = true;
+                saveFileDialog1.FileName = path + "\\" + basename + "_TroubleShoot.zip";
+
+                if (saveFileDialog1.ShowDialog() != DialogResult.OK) return;
+                if (string.IsNullOrWhiteSpace(saveFileDialog1.FileName)) return;
+
+                using (new BusyScope(this, Working_label))
                 {
-                    ZipArchiveEntry info = zip.CreateEntry("Sim Information.txt");
-                    using (Stream zipEntryStream = info.Open())
+                    if (File.Exists(saveFileDialog1.FileName)) File.Delete(saveFileDialog1.FileName);
+
+                    using (ZipArchive zip = ZipFile.Open(saveFileDialog1.FileName, ZipArchiveMode.Create))
                     {
-                        MemoryStream ms = new MemoryStream(ASCIIEncoding.Default.GetBytes((string)SimInfo_button.Tag));
-                        ms.CopyTo(zipEntryStream);
-                    }
-                    if (errorList.Length > 0)
-                    {
-                        ZipArchiveEntry err = zip.CreateEntry("Sim Errors.txt");
-                        using (Stream zipEntryStream = err.Open())
+                        ZipArchiveEntry info = zip.CreateEntry("Sim Information.txt");
+                        using (Stream zipEntryStream = info.Open())
                         {
-                            MemoryStream ms = new MemoryStream(ASCIIEncoding.Default.GetBytes(errorList));
+                            string simInfoText = SimInfo_button.Tag as string;
+                            if (string.IsNullOrEmpty(simInfoText)) simInfoText = simDesc;
+                            MemoryStream ms = new MemoryStream(ASCIIEncoding.Default.GetBytes(simInfoText ?? ""));
                             ms.CopyTo(zipEntryStream);
                         }
-                    }
-                    if (currentSaveGame != null)
-                    {
-                        ZipArchiveEntry save = zip.CreateEntry(currentSaveName + ".save");
-                        using (Stream zipEntryStream = save.Open())
+
+                        if (!string.IsNullOrEmpty(errorList))
                         {
-                            Stream s = new MemoryStream();
-                            currentSaveGame.SaveAs(s);
-                            s.Position = 0;
-                            s.CopyTo(zipEntryStream);
+                            ZipArchiveEntry err = zip.CreateEntry("Sim Errors.txt");
+                            using (Stream zipEntryStream = err.Open())
+                            {
+                                MemoryStream ms = new MemoryStream(ASCIIEncoding.Default.GetBytes(errorList));
+                                ms.CopyTo(zipEntryStream);
+                            }
                         }
-                    }
-                    if (TroubleshootPackageTuning != null && TroubleshootPackageTuning.GetResourceList.Count > 0)
-                    {
-                        ZipArchiveEntry tune = zip.CreateEntry("CASModifierCCTuning.package");
-                        using (Stream zipEntryStream = tune.Open())
+
+                        if (currentSaveGame != null)
                         {
-                            Stream s = new MemoryStream();
-                            TroubleshootPackageTuning.SaveAs(s);
-                            s.Position = 0;
-                            s.CopyTo(zipEntryStream);
+                            string saveName = !string.IsNullOrWhiteSpace(currentSaveName) ? currentSaveName : "Save";
+                            ZipArchiveEntry save = zip.CreateEntry(saveName + ".save");
+                            using (Stream zipEntryStream = save.Open())
+                            {
+                                Stream s = new MemoryStream();
+                                currentSaveGame.SaveAs(s);
+                                s.Position = 0;
+                                s.CopyTo(zipEntryStream);
+                            }
                         }
-                    }
-                    if (TroubleshootPackageBasic != null)
-                    {
-                        ZipArchiveEntry entry = zip.CreateEntry("Basic Sim Resources.package");
-                        using (Stream zipEntryStream = entry.Open())
+
+                        if (TroubleshootPackageTuning != null && TroubleshootPackageTuning.GetResourceList.Count > 0)
                         {
-                            Stream s = new MemoryStream();
-                            TroubleshootPackageBasic.SaveAs(s);
-                            s.Position = 0;
-                            s.CopyTo(zipEntryStream);
+                            ZipArchiveEntry tune = zip.CreateEntry("CASModifierCCTuning.package");
+                            using (Stream zipEntryStream = tune.Open())
+                            {
+                                Stream s = new MemoryStream();
+                                TroubleshootPackageTuning.SaveAs(s);
+                                s.Position = 0;
+                                s.CopyTo(zipEntryStream);
+                            }
                         }
-                    }
-                    if (TroubleshootPackageOutfit != null)
-                    {
-                        ZipArchiveEntry outfit = zip.CreateEntry(Outfits_comboBox.SelectedItem.ToString() + " Outfit Resources.package");
-                        using (Stream zipEntryStream = outfit.Open())
+
+                        if (TroubleshootPackageBasic != null)
                         {
-                            Stream s = new MemoryStream();
-                            TroubleshootPackageOutfit.SaveAs(s);
-                            s.Position = 0;
-                            s.CopyTo(zipEntryStream);
+                            ZipArchiveEntry entry = zip.CreateEntry("Basic Sim Resources.package");
+                            using (Stream zipEntryStream = entry.Open())
+                            {
+                                Stream s = new MemoryStream();
+                                TroubleshootPackageBasic.SaveAs(s);
+                                s.Position = 0;
+                                s.CopyTo(zipEntryStream);
+                            }
+                        }
+
+                        if (TroubleshootPackageOutfit != null)
+                        {
+                            string outfitName = Outfits_comboBox.SelectedItem != null ? Outfits_comboBox.SelectedItem.ToString() : "Outfit";
+                            ZipArchiveEntry outfit = zip.CreateEntry(outfitName + " Outfit Resources.package");
+                            using (Stream zipEntryStream = outfit.Open())
+                            {
+                                Stream s = new MemoryStream();
+                                TroubleshootPackageOutfit.SaveAs(s);
+                                s.Position = 0;
+                                s.CopyTo(zipEntryStream);
+                            }
                         }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                ErrorReporter.ShowError(this, "Troubleshoot Zip", "Could not create the troubleshooting zip.", ex);
             }
         }
 
